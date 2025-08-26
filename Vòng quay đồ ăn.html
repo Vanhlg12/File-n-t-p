@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>What to Eat Today - Random Food Spinner</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 800px;
+        width: 100%;
+      }
+
+      h1 {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.2rem;
+        margin-bottom: 40px;
+      }
+
+      .wheel-container {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        margin: 0 auto 40px;
+      }
+
+      .wheel {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: transform 4s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      .wheel-segment {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        transform-origin: right bottom;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        font-size: 14px;
+        text-align: center;
+        padding: 10px;
+      }
+
+      .pointer {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 30px solid #ff6b6b;
+        z-index: 10;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      }
+
+      .center-circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: #ff6b6b;
+        border-radius: 50%;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .spin-button {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        margin-bottom: 30px;
+      }
+
+      .spin-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .spin-button:active {
+        transform: translateY(0);
+      }
+
+      .spin-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .result {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+      }
+
+      .result.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .result h2 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .result .food-name {
+        color: #ff6b6b;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .food-list {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .food-list h3 {
+        color: white;
+        margin-bottom: 15px;
+      }
+
+      .food-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+      }
+
+      .food-tag {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 480px) {
+        .wheel-container {
+          width: 300px;
+          height: 300px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        .wheel-segment {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🍽️ What to Eat Today?</h1>
+      <p class="subtitle">Let the wheel decide your lunch destiny!</p>
+
+      <div class="wheel-container">
+        <div class="pointer"></div>
+        <div class="wheel" id="wheel">
+          <!-- Wheel segments will be generated by JavaScript -->
+        </div>
+        <div class="center-circle">SPIN</div>
+      </div>
+
+      <button class="spin-button" id="spinButton">🎯 Spin the Wheel!</button>
+
+      <div class="result" id="result">
+        <h2>🎉 Today's Lunch Choice:</h2>
+        <div class="food-name" id="foodName"></div>
+      </div>
+
+      <div class="food-list">
+        <h3>🍜 All Food Options:</h3>
+        <div class="food-tags" id="foodTags"></div>
+      </div>
+    </div>
+
+    <script>
+      const foods = [
+        "🍕 Pizza",
+        "🍣 Sushi",
+        "🍔 Burger",
+        "🥗 Salad",
+        "🌮 Tacos",
+        "🍝 Pasta",
+        "🥪 Sandwich",
+        "🍜 Ramen",
+        "🍛 Thai Curry",
+        "🍗 Fried Chicken",
+        "🌯 Burrito",
+        "🍜 Pho",
+        "🍖 BBQ",
+        "🥙 Mediterranean",
+        "🍛 Indian Curry",
+        "🍲 Soup",
+        "🥘 Stir Fry",
+        "🌯 Wraps",
+        "🍚 Poke Bowl",
+        "🥟 Dim Sum",
+      ];
+
+      const colors = [
+        "#FF6B6B",
+        "#4ECDC4",
+        "#45B7D1",
+        "#96CEB4",
+        "#FFEAA7",
+        "#DDA0DD",
+        "#98D8C8",
+        "#F7DC6F",
+        "#BB8FCE",
+        "#85C1E9",
+        "#F8C471",
+        "#82E0AA",
+        "#F1948A",
+        "#85C1E9",
+        "#D7BDE2",
+        "#A3E4D7",
+        "#FAD7A0",
+        "#D5A6BD",
+        "#AED6F1",
+        "#A9DFBF",
+      ];
+
+      let isSpinning = false;
+      let currentRotation = 0;
+
+      function createWheel() {
+        const wheel = document.getElementById("wheel");
+        const segmentAngle = 360 / foods.length;
+
+        foods.forEach((food, index) => {
+          const segment = document.createElement("div");
+          segment.className = "wheel-segment";
+          segment.style.background = colors[index];
+          segment.style.transform = `rotate(${index * segmentAngle}deg) skewY(${
+            90 - segmentAngle
+          }deg)`;
+          segment.textContent = food;
+          wheel.appendChild(segment);
+        });
+
+        // Create food tags
+        const foodTags = document.getElementById("foodTags");
+        foods.forEach((food) => {
+          const tag = document.createElement("span");
+          tag.className = "food-tag";
+          tag.textContent = food;
+          foodTags.appendChild(tag);
+        });
+      }
+
+      function spinWheel() {
+        if (isSpinning) return;
+
+        isSpinning = true;
+        const spinButton = document.getElementById("spinButton");
+        const wheel = document.getElementById("wheel");
+        const result = document.getElementById("result");
+
+        spinButton.disabled = true;
+        spinButton.textContent = "🌀 Spinning...";
+        result.classList.remove("show");
+
+        // Calculate random spin (multiple full rotations + random angle)
+        const spins = 5 + Math.random() * 5; // 5-10 full rotations
+        const randomAngle = Math.random() * 360;
+        const totalRotation = currentRotation + spins * 360 + randomAngle;
+
+        wheel.style.transform = `rotate(${totalRotation}deg)`;
+        currentRotation = totalRotation % 360;
+
+        // Calculate winning segment
+        setTimeout(() => {
+          const segmentAngle = 360 / foods.length;
+          const normalizedAngle = (360 - (currentRotation % 360) + 90) % 360;
+          const winningIndex = Math.floor(normalizedAngle / segmentAngle);
+          const winner = foods[winningIndex];
+
+          // Show result
+          document.getElementById("foodName").textContent = winner;
+          result.classList.add("show");
+
+          spinButton.disabled = false;
+          spinButton.textContent = "🎯 Spin Again!";
+          isSpinning = false;
+        }, 4000);
+      }
+
+      // Initialize the wheel
+      createWheel();
+
+      // Add event listener
+      document
+        .getElementById("spinButton")
+        .addEventListener("click", spinWheel);
+
+      // Also allow clicking the center circle to spin
+      document
+        .querySelector(".center-circle")
+        .addEventListener("click", spinWheel);
+    </script>
+  </body>
+</html>
+</div>

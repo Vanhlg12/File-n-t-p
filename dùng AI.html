@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n="meta.title">Multilingual Starter</title>
+    <meta
+      name="description"
+      data-i18n="meta.desc"
+      content="A simple multilingual website with auto detection and language switcher."
+    />
+    <style>
+      :root {
+        --bg: #0f172a; /* slate-900 */
+        --panel: #111827; /* gray-900 */
+        --soft: #1f2937; /* gray-800 */
+        --txt: #e5e7eb; /* gray-200 */
+        --muted: #9ca3af; /* gray-400 */
+        --brand: #60a5fa; /* blue-400 */
+        --accent: #34d399; /* emerald-400 */
+        --danger: #f87171; /* red-400 */
+        --radius: 14px;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+          "Segoe UI Emoji";
+        background: radial-gradient(
+            1200px 600px at 30% -10%,
+            #1e293b 0,
+            #0b1222 55%,
+            #070b14 100%
+          ),
+          var(--bg);
+        color: var(--txt);
+      }
+      header {
+        position: sticky;
+        top: 0;
+        backdrop-filter: blur(8px);
+        background: linear-gradient(
+          180deg,
+          rgba(17, 24, 39, 0.85),
+          rgba(17, 24, 39, 0.35)
+        );
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        z-index: 50;
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-weight: 700;
+      }
+      .logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--brand), #a78bfa);
+        display: grid;
+        place-items: center;
+        box-shadow: var(--shadow);
+      }
+      nav a {
+        color: var(--muted);
+        text-decoration: none;
+        margin: 0 10px;
+        font-weight: 600;
+      }
+      nav a:hover {
+        color: var(--txt);
+      }
+      .lang {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: var(--soft);
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      select {
+        appearance: none;
+        background: transparent;
+        border: none;
+        color: var(--txt);
+        font-weight: 600;
+        outline: none;
+        padding-right: 18px;
+        cursor: pointer;
+      }
+      main {
+        padding: 40px 0;
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 30px;
+        align-items: center;
+      }
+      h1 {
+        font-size: clamp(32px, 4vw, 52px);
+        line-height: 1.1;
+        margin: 0 0 10px;
+      }
+      p.lead {
+        color: var(--muted);
+        font-size: clamp(16px, 1.4vw, 18px);
+      }
+      .cta {
+        display: flex;
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .btn {
+        padding: 12px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: linear-gradient(
+          180deg,
+          rgba(96, 165, 250, 0.35),
+          rgba(96, 165, 250, 0.08)
+        );
+        color: white;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn.secondary {
+        background: transparent;
+        color: var(--txt);
+      }
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.04),
+          rgba(255, 255, 255, 0.02)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-top: 30px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+          "Liberation Mono", monospace;
+      }
+      .section {
+        margin: 60px 0;
+      }
+      .kpi {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+      }
+      .kpi span {
+        font-size: 32px;
+        font-weight: 800;
+      }
+      .code {
+        background: #0b1222;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 14px;
+        border-radius: 12px;
+        overflow: auto;
+      }
+      form {
+        display: grid;
+        gap: 12px;
+      }
+      input,
+      textarea {
+        background: #0b1222;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        color: var(--txt);
+        padding: 12px 14px;
+        width: 100%;
+      }
+      .error {
+        color: var(--danger);
+        font-size: 14px;
+        display: none;
+      }
+      footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 30px 0;
+        color: var(--muted);
+      }
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap row" role="navigation" aria-label="Main">
+        <div class="brand" aria-label="Brand">
+          <div class="logo" aria-hidden="true">🌐</div>
+          <span data-i18n="brand.name">Polyglot Site</span>
+        </div>
+
+        <nav>
+          <a href="#features" data-i18n="nav.features">Features</a>
+          <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
+          <a href="#faq" data-i18n="nav.faq">FAQ</a>
+          <a href="#contact" data-i18n="nav.contact">Contact</a>
+        </nav>
+
+        <div class="lang" aria-label="Language switcher">
+          <span class="muted" data-i18n="ui.language">Language</span>
+          <select id="lang" aria-label="Select language">
+            <option value="en">English 🇬🇧</option>
+            <option value="vi">Tiếng Việt 🇻🇳</option>
+            <option value="ja">日本語 🇯🇵</option>
+            <option value="zh">简体中文 🇨🇳</option>
+            <option value="de">Deutsch 🇩🇪</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="hero">
+        <div>
+          <h1 data-i18n="hero.title">Build multilingual sites in minutes.</h1>
+          <p class="lead" data-i18n="hero.subtitle">
+            Lightweight i18n, auto-detection, and a clean switcher without
+            external dependencies.
+          </p>
+          <div class="cta">
+            <a class="btn" href="#features"
+              >⚡ <span data-i18n="hero.ctaPrimary">See Features</span></a
+            >
+            <a class="btn secondary" href="#contact"
+              >✉️ <span data-i18n="hero.ctaSecondary">Contact Sales</span></a
+            >
+          </div>
+          <div class="section kpi">
+            <span id="today"></span>
+            <div class="muted" data-i18n="hero.today">Today (localized):</div>
+          </div>
+          <div class="kpi">
+            <span id="price"></span>
+            <div class="muted" data-i18n="hero.price">
+              Localized price example
+            </div>
+          </div>
+        </div>
+
+        <div class="card code">
+          <pre><code class="mono">&lt;!-- 3-step i18n --&gt;
+1. Mark text with <span class="muted">data-i18n</span>
+2. Add translations in <span class="muted">translations</span>
+3. Call <span class="muted">applyTranslations(lang)</span></code></pre>
+          <p class="muted" data-i18n="hero.note">
+            Works offline. No API keys. Super fast.
+          </p>
+        </div>
+      </section>
+
+      <section id="features" class="section">
+        <h2>✨ <span data-i18n="features.title">Features</span></h2>
+        <div class="grid">
+          <div class="card">
+            <h3 data-i18n="features.auto">Automatic Detection</h3>
+            <p class="muted" data-i18n="features.autoDesc">
+              Detects browser language and URL param. Falls back to English.
+            </p>
+          </div>
+          <div class="card">
+            <h3 data-i18n="features.persist">Persistent Choice</h3>
+            <p class="muted" data-i18n="features.persistDesc">
+              Remembers your language via localStorage and updates meta tags.
+            </p>
+          </div>
+          <div class="card">
+            <h3 data-i18n="features.access">Accessible & SEO-friendly</h3>
+            <p class="muted" data-i18n="features.accessDesc">
+              Updates placeholders, titles, and ARIA labels for screen readers.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" class="section">
+        <h2>💸 <span data-i18n="pricing.title">Pricing</span></h2>
+        <div class="grid">
+          <div class="card">
+            <h3 data-i18n="pricing.free.title">Free</h3>
+            <p class="muted" data-i18n="pricing.free.desc">
+              For hobby projects
+            </p>
+            <p>
+              <strong>0</strong>
+              <span class="muted" data-i18n="pricing.mo">/ month</span>
+            </p>
+          </div>
+          <div class="card">
+            <h3 data-i18n="pricing.pro.title">Pro</h3>
+            <p class="muted" data-i18n="pricing.pro.desc">
+              For teams that ship
+            </p>
+            <p>
+              <strong data-i18n="pricing.pro.price">19</strong>
+              <span class="muted" data-i18n="pricing.mo">/ month</span>
+            </p>
+          </div>
+          <div class="card">
+            <h3 data-i18n="pricing.enterprise.title">Enterprise</h3>
+            <p class="muted" data-i18n="pricing.enterprise.desc">
+              Custom SLAs & SSO
+            </p>
+            <p><strong>—</strong></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="section">
+        <h2>❓ <span data-i18n="faq.title">FAQ</span></h2>
+        <div class="grid">
+          <div class="card">
+            <h3 data-i18n="faq.q1">Does it require an API?</h3>
+            <p class="muted" data-i18n="faq.a1">
+              No. All translations are bundled.
+            </p>
+          </div>
+          <div class="card">
+            <h3 data-i18n="faq.q2">Can I add more languages?</h3>
+            <p class="muted" data-i18n="faq.a2">
+              Yes. Extend the translations object.
+            </p>
+          </div>
+          <div class="card">
+            <h3 data-i18n="faq.q3">Is SSR required?</h3>
+            <p class="muted" data-i18n="faq.a3">
+              No. Works on any static host.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section">
+        <h2>✉️ <span data-i18n="contact.title">Contact</span></h2>
+        <div class="card">
+          <form id="contactForm" novalidate>
+            <label>
+              <span data-i18n="contact.name">Your name</span>
+              <input
+                name="name"
+                type="text"
+                required
+                placeholder=""
+                data-i18n-placeholder="contact.name.ph"
+              />
+            </label>
+            <label>
+              <span data-i18n="contact.email">Email</span>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder=""
+                data-i18n-placeholder="contact.email.ph"
+              />
+            </label>
+            <label>
+              <span data-i18n="contact.msg">Message</span>
+              <textarea
+                name="msg"
+                rows="4"
+                required
+                data-i18n-placeholder="contact.msg.ph"
+              ></textarea>
+            </label>
+            <p class="error" id="formError" role="alert"></p>
+            <button class="btn" type="submit">
+              🚀 <span data-i18n="contact.send">Send</span>
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap row">
+        <div class="muted">
+          © <span id="year"></span>
+          <span data-i18n="brand.name">Polyglot Site</span>
+        </div>
+        <div class="muted">
+          <span data-i18n="footer.powered">Powered by vanilla JS & Intl</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // ---- i18n data -----------------------------------------------------------
+      const translations = {
+        en: {
+          "meta.title": "Multilingual Starter",
+          "meta.desc":
+            "A simple multilingual website with auto detection and language switcher.",
+          "brand.name": "Polyglot Site",
+          "nav.features": "Features",
+          "nav.pricing": "Pricing",
+          "nav.faq": "FAQ",
+          "nav.contact": "Contact",
+          "ui.language": "Language",
+          "hero.title": "Build multilingual sites in minutes.",
+          "hero.subtitle":
+            "Lightweight i18n, auto-detection, and a clean switcher without external dependencies.",
+          "hero.ctaPrimary": "See Features",
+          "hero.ctaSecondary": "Contact Sales",
+          "hero.today": "Today (localized):",
+          "hero.price": "Localized price example",
+          "hero.note": "Works offline. No API keys. Super fast.",
+          "features.title": "Features",
+          "features.auto": "Automatic Detection",
+          "features.autoDesc":
+            "Detects browser language and URL param. Falls back to English.",
+          "features.persist": "Persistent Choice",
+          "features.persistDesc":
+            "Remembers your language via localStorage and updates meta tags.",
+          "features.access": "Accessible & SEO-friendly",
+          "features.accessDesc":
+            "Updates placeholders, titles, and ARIA labels for screen readers.",
+          "pricing.title": "Pricing",
+          "pricing.free.title": "Free",
+          "pricing.free.desc": "For hobby projects",
+          "pricing.pro.title": "Pro",
+          "pricing.pro.desc": "For teams that ship",
+          "pricing.pro.price": "19",
+          "pricing.enterprise.title": "Enterprise",
+          "pricing.enterprise.desc": "Custom SLAs & SSO",
+          "pricing.mo": "/ month",
+          "faq.title": "FAQ",
+          "faq.q1": "Does it require an API?",
+          "faq.a1": "No. All translations are bundled.",
+          "faq.q2": "Can I add more languages?",
+          "faq.a2": "Yes. Extend the translations object.",
+          "faq.q3": "Is SSR required?",
+          "faq.a3": "No. Works on any static host.",
+          "contact.title": "Contact",
+          "contact.name": "Your name",
+          "contact.name.ph": "Jane Doe",
+          "contact.email": "Email",
+          "contact.email.ph": "you@example.com",
+          "contact.msg": "Message",
+          "contact.msg.ph": "How can we help?",
+          "contact.send": "Send",
+          "error.required": "Please fill out all fields.",
+          "error.email": "Please enter a valid email address.",
+          "footer.powered": "Powered by vanilla JS & Intl",
+        },
+        vi: {
+          "meta.title": "Trình khởi tạo đa ngôn ngữ",
+          "meta.desc":
+            "Website đa ngôn ngữ đơn giản, tự động phát hiện và chuyển đổi.",
+          "brand.name": "Trang Polyglot",
+          "nav.features": "Tính năng",
+          "nav.pricing": "Giá",
+          "nav.faq": "Hỏi đáp",
+          "nav.contact": "Liên hệ",
+          "ui.language": "Ngôn ngữ",
+          "hero.title": "Xây dựng website đa ngôn ngữ trong vài phút.",
+          "hero.subtitle":
+            "i18n gọn nhẹ, tự phát hiện và chuyển đổi mượt mà, không phụ thuộc bên ngoài.",
+          "hero.ctaPrimary": "Xem tính năng",
+          "hero.ctaSecondary": "Liên hệ bán hàng",
+          "hero.today": "Hôm nay (định dạng địa phương):",
+          "hero.price": "Ví dụ định dạng giá",
+          "hero.note": "Hoạt động ngoại tuyến. Không cần API. Rất nhanh.",
+          "features.title": "Tính năng",
+          "features.auto": "Tự động phát hiện",
+          "features.autoDesc":
+            "Phát hiện ngôn ngữ trình duyệt và tham số URL. Mặc định tiếng Anh.",
+          "features.persist": "Ghi nhớ lựa chọn",
+          "features.persistDesc": "Lưu ngôn ngữ của bạn và cập nhật thẻ meta.",
+          "features.access": "Truy cập & SEO",
+          "features.accessDesc":
+            "Cập nhật placeholder, title, ARIA cho trình đọc màn hình.",
+          "pricing.title": "Bảng giá",
+          "pricing.free.title": "Miễn phí",
+          "pricing.free.desc": "Cho dự án cá nhân",
+          "pricing.pro.title": "Pro",
+          "pricing.pro.desc": "Cho đội ngũ triển khai nhanh",
+          "pricing.pro.price": "19",
+          "pricing.enterprise.title": "Doanh nghiệp",
+          "pricing.enterprise.desc": "SLA & SSO tùy chỉnh",
+          "pricing.mo": "/ tháng",
+          "faq.title": "Hỏi đáp",
+          "faq.q1": "Có cần API không?",
+          "faq.a1": "Không. Tất cả bản dịch được đóng gói sẵn.",
+          "faq.q2": "Có thể thêm ngôn ngữ khác?",
+          "faq.a2": "Có. Chỉ cần mở rộng đối tượng translations.",
+          "faq.q3": "Cần SSR không?",
+          "faq.a3": "Không. Chạy trên mọi hosting tĩnh.",
+          "contact.title": "Liên hệ",
+          "contact.name": "Tên của bạn",
+          "contact.name.ph": "Nguyễn Văn A",
+          "contact.email": "Email",
+          "contact.email.ph": "ban@example.com",
+          "contact.msg": "Lời nhắn",
+          "contact.msg.ph": "Chúng tôi có thể giúp gì?",
+          "contact.send": "Gửi",
+          "error.required": "Vui lòng điền đầy đủ.",
+          "error.email": "Vui lòng nhập email hợp lệ.",
+          "footer.powered": "Chạy bằng vanilla JS & Intl",
+        },
+        ja: {
+          "meta.title": "多言語スターター",
+          "meta.desc": "自動検出と言語切替を備えたシンプルな多言語サイト。",
+          "brand.name": "ポリグロットサイト",
+          "nav.features": "機能",
+          "nav.pricing": "料金",
+          "nav.faq": "よくある質問",
+          "nav.contact": "お問い合わせ",
+          "ui.language": "言語",
+          "hero.title": "数分で多言語サイトを構築。",
+          "hero.subtitle":
+            "軽量 i18n、⾃動検出、依存なしのクリーンなスイッチャー。",
+          "hero.ctaPrimary": "機能を見る",
+          "hero.ctaSecondary": "営業に連絡",
+          "hero.today": "本日（ローカライズ）:",
+          "hero.price": "価格のローカライズ例",
+          "hero.note": "オフラインで動作。API不要。超高速。",
+          "features.title": "機能",
+          "features.auto": "自動検出",
+          "features.autoDesc":
+            "ブラウザー言語とURLパラメータを検出。英語にフォールバック。",
+          "features.persist": "選択を保持",
+          "features.persistDesc": "言語を保存し、metaタグを更新。",
+          "features.access": "アクセシビリティ & SEO",
+          "features.accessDesc": "プレースホルダー、タイトル、ARIAを更新。",
+          "pricing.title": "料金",
+          "pricing.free.title": "無料",
+          "pricing.free.desc": "趣味向け",
+          "pricing.pro.title": "プロ",
+          "pricing.pro.desc": "本気のチーム向け",
+          "pricing.pro.price": "19",
+          "pricing.enterprise.title": "エンタープライズ",
+          "pricing.enterprise.desc": "カスタムSLAとSSO",
+          "pricing.mo": "/ 月",
+          "faq.title": "FAQ",
+          "faq.q1": "APIは必要？",
+          "faq.a1": "不要。翻訳は同梱。",
+          "faq.q2": "言語を追加できる？",
+          "faq.a2": "はい。translationsを拡張してください。",
+          "faq.q3": "SSRは必須？",
+          "faq.a3": "いいえ。静的ホスティングで動作します。",
+          "contact.title": "お問い合わせ",
+          "contact.name": "お名前",
+          "contact.name.ph": "山田 太郎",
+          "contact.email": "メール",
+          "contact.email.ph": "you@example.com",
+          "contact.msg": "メッセージ",
+          "contact.msg.ph": "どのようにお手伝いできますか？",
+          "contact.send": "送信",
+          "error.required": "すべての項目を入力してください。",
+          "error.email": "正しいメールアドレスを入力してください。",
+          "footer.powered": "vanilla JS と Intl で動作",
+        },
+        zh: {
+          "meta.title": "多语言入门站点",
+          "meta.desc": "带自动检测与语言切换的简洁多语言网站。",
+          "brand.name": "多语站点",
+          "nav.features": "功能",
+          "nav.pricing": "定价",
+          "nav.faq": "常见问题",
+          "nav.contact": "联系",
+          "ui.language": "语言",
+          "hero.title": "几分钟内构建多语言网站。",
+          "hero.subtitle": "轻量 i18n、自动检测、无需外部依赖的切换器。",
+          "hero.ctaPrimary": "查看功能",
+          "hero.ctaSecondary": "联系销售",
+          "hero.today": "今天（本地化）：",
+          "hero.price": "价格本地化示例",
+          "hero.note": "离线可用。无需 API。非常快。",
+          "features.title": "功能",
+          "features.auto": "自动检测",
+          "features.autoDesc": "检测浏览器语言与 URL 参数，默认回退到英文。",
+          "features.persist": "记住选择",
+          "features.persistDesc":
+            "通过 localStorage 记住语言并更新 meta 标签。",
+          "features.access": "无障碍与 SEO",
+          "features.accessDesc": "更新占位符、标题与 ARIA 标签。",
+          "pricing.title": "定价",
+          "pricing.free.title": "免费",
+          "pricing.free.desc": "适合个人项目",
+          "pricing.pro.title": "专业版",
+          "pricing.pro.desc": "适合高效团队",
+          "pricing.pro.price": "19",
+          "pricing.enterprise.title": "企业版",
+          "pricing.enterprise.desc": "自定义 SLA 与 SSO",
+          "pricing.mo": "/ 月",
+          "faq.title": "常见问题",
+          "faq.q1": "需要 API 吗？",
+          "faq.a1": "不需要。翻译已内置。",
+          "faq.q2": "可以添加更多语言吗？",
+          "faq.a2": "可以。扩展 translations 对象即可。",
+          "faq.q3": "必须 SSR 吗？",
+          "faq.a3": "不必。任何静态托管均可运行。",
+          "contact.title": "联系",
+          "contact.name": "您的姓名",
+          "contact.name.ph": "张三",
+          "contact.email": "邮箱",
+          "contact.email.ph": "you@example.com",
+          "contact.msg": "留言",
+          "contact.msg.ph": "我们能帮你什么？",
+          "contact.send": "发送",
+          "error.required": "请填写所有字段。",
+          "error.email": "请输入有效的邮箱地址。",
+          "footer.powered": "基于 vanilla JS 与 Intl",
+        },
+        de: {
+          "meta.title": "Mehrsprachiger Starter",
+          "meta.desc":
+            "Einfache mehrsprachige Website mit Auto-Erkennung und Umschalter.",
+          "brand.name": "Polyglot-Website",
+          "nav.features": "Funktionen",
+          "nav.pricing": "Preise",
+          "nav.faq": "FAQ",
+          "nav.contact": "Kontakt",
+          "ui.language": "Sprache",
+          "hero.title": "In Minuten mehrsprachige Seiten bauen.",
+          "hero.subtitle":
+            "Leichtes i18n, Auto-Erkennung und sauberer Umschalter ohne Abhängigkeiten.",
+          "hero.ctaPrimary": "Funktionen ansehen",
+          "hero.ctaSecondary": "Vertrieb kontaktieren",
+          "hero.today": "Heute (lokalisiert):",
+          "hero.price": "Beispiel für Preisformat",
+          "hero.note": "Offline nutzbar. Keine API-Schlüssel. Blitzschnell.",
+          "features.title": "Funktionen",
+          "features.auto": "Automatische Erkennung",
+          "features.autoDesc":
+            "Erkennt Browsersprache & URL-Parameter. Fallback Englisch.",
+          "features.persist": "Auswahl merken",
+          "features.persistDesc":
+            "Speichert die Sprache und aktualisiert Meta-Tags.",
+          "features.access": "Barrierefrei & SEO-freundlich",
+          "features.accessDesc":
+            "Aktualisiert Platzhalter, Titel und ARIA-Labels.",
+          "pricing.title": "Preise",
+          "pricing.free.title": "Gratis",
+          "pricing.free.desc": "Für Hobbyprojekte",
+          "pricing.pro.title": "Pro",
+          "pricing.pro.desc": "Für Teams, die liefern",
+          "pricing.pro.price": "19",
+          "pricing.enterprise.title": "Enterprise",
+          "pricing.enterprise.desc": "Individuelle SLAs & SSO",
+          "pricing.mo": "/ Monat",
+          "faq.title": "FAQ",
+          "faq.q1": "Wird eine API benötigt?",
+          "faq.a1": "Nein. Übersetzungen sind gebündelt.",
+          "faq.q2": "Mehr Sprachen hinzufügen?",
+          "faq.a2": "Ja. translations-Objekt erweitern.",
+          "faq.q3": "Ist SSR nötig?",
+          "faq.a3": "Nein. Läuft auf jedem Static Host.",
+          "contact.title": "Kontakt",
+          "contact.name": "Ihr Name",
+          "contact.name.ph": "Max Mustermann",
+          "contact.email": "E-Mail",
+          "contact.email.ph": "du@example.com",
+          "contact.msg": "Nachricht",
+          "contact.msg.ph": "Wobei können wir helfen?",
+          "contact.send": "Senden",
+          "error.required": "Bitte alle Felder ausfüllen.",
+          "error.email": "Bitte eine gültige E-Mail eingeben.",
+          "footer.powered": "Mit vanilla JS & Intl",
+        },
+      };
+
+      // Language aliases to our keys
+      const LOCALE_MAP = {
+        en: "en",
+        "en-US": "en",
+        "en-GB": "en",
+        vi: "vi",
+        "vi-VN": "vi",
+        ja: "ja",
+        "ja-JP": "ja",
+        zh: "zh",
+        "zh-CN": "zh",
+        "zh-Hans": "zh",
+        "zh-SG": "zh",
+        de: "de",
+        "de-DE": "de",
+        "de-AT": "de",
+        "de-CH": "de",
+      };
+
+      // ---- helpers -------------------------------------------------------------
+      const $ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+      function getInitialLang() {
+        // 1) URL ?lang=  2) localStorage  3) navigator.language  4) default 'en'
+        const url = new URL(window.location.href);
+        const q = (url.searchParams.get("lang") || "").toLowerCase();
+        const byUrl =
+          q && ["en", "vi", "ja", "zh", "de"].includes(q) ? q : null;
+        const stored = localStorage.getItem("lang");
+        if (byUrl) return byUrl;
+        if (stored && translations[stored]) return stored;
+        const nav =
+          LOCALE_MAP[navigator.language] ||
+          LOCALE_MAP[(navigator.languages || []).find((l) => LOCALE_MAP[l])] ||
+          "en";
+        return translations[nav] ? nav : "en";
+      }
+
+      function setLangAttr(lang) {
+        document.documentElement.lang = lang;
+        // For simplicity, we don't switch writing direction (all LTR here)
+      }
+
+      function formatExamples(lang) {
+        const locale =
+          lang === "zh"
+            ? "zh-CN"
+            : lang === "vi"
+            ? "vi-VN"
+            : lang === "ja"
+            ? "ja-JP"
+            : lang === "de"
+            ? "de-DE"
+            : "en-US";
+        const now = new Date();
+        const dateFmt = new Intl.DateTimeFormat(locale, {
+          dateStyle: "full",
+          timeStyle: "short",
+        });
+        const currency = new Intl.NumberFormat(locale, {
+          style: "currency",
+          currency:
+            lang === "de"
+              ? "EUR"
+              : lang === "vi"
+              ? "VND"
+              : lang === "ja"
+              ? "JPY"
+              : lang === "zh"
+              ? "CNY"
+              : "USD",
+        }).format(1999);
+        document.getElementById("today").textContent = dateFmt.format(now);
+        document.getElementById("price").textContent = currency;
+      }
+
+      function applyTranslations(lang) {
+        const dict = translations[lang] || translations.en;
+        // Elements with innerText keys
+        $("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (dict[key]) el.textContent = dict[key];
+        });
+        // Placeholders
+        $("[data-i18n-placeholder]").forEach((el) => {
+          const key = el.getAttribute("data-i18n-placeholder");
+          if (dict[key]) el.setAttribute("placeholder", dict[key]);
+        });
+        // Title tag + meta desc
+        const t = dict["meta.title"];
+        if (t) document.title = t;
+        const d = dict["meta.desc"];
+        if (d) {
+          const md = document.querySelector('meta[name="description"]');
+          if (md) md.setAttribute("content", d);
+        }
+        // Update ARIA labels for better a11y
+        const switcher = document.querySelector(".lang");
+        if (switcher)
+          switcher.setAttribute(
+            "aria-label",
+            (dict["ui.language"] || "Language") + " switcher"
+          );
+        // Reflect language in select
+        const sel = document.getElementById("lang");
+        if (sel && sel.value !== lang) sel.value = lang;
+
+        setLangAttr(lang);
+        formatExamples(lang);
+      }
+
+      function changeLanguage(lang) {
+        if (!translations[lang]) lang = "en";
+        localStorage.setItem("lang", lang);
+        applyTranslations(lang);
+        // Update URL (no reload)
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", lang);
+        window.history.replaceState({}, "", url.toString());
+      }
+
+      // ---- form validation -----------------------------------------------------
+      function validate(form, lang) {
+        const dict = translations[lang] || translations.en;
+        const errEl = document.getElementById("formError");
+        errEl.style.display = "none";
+        errEl.textContent = "";
+
+        const data = Object.fromEntries(new FormData(form).entries());
+        if (!data.name || !data.email || !data.msg) {
+          errEl.textContent = dict["error.required"];
+          errEl.style.display = "block";
+          return false;
+        }
+        const ok = /\S+@\S+\.\S+/.test(data.email);
+        if (!ok) {
+          errEl.textContent = dict["error.email"];
+          errEl.style.display = "block";
+          return false;
+        }
+        return true;
+      }
+
+      // ---- boot ---------------------------------------------------------------
+      (function init() {
+        const lang = getInitialLang();
+        document
+          .getElementById("lang")
+          .addEventListener("change", (e) => changeLanguage(e.target.value));
+        applyTranslations(lang);
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // Handle form
+        document
+          .getElementById("contactForm")
+          .addEventListener("submit", (e) => {
+            e.preventDefault();
+            const lang = localStorage.getItem("lang") || getInitialLang();
+            if (!validate(e.target, lang)) return;
+
+            // Demo "submit"
+            const dict = translations[lang] || translations.en;
+            alert("✅ " + (dict["contact.send"] || "Send") + " ✓");
+            e.target.reset();
+          });
+
+        // (Optional) react to browser language changes if supported
+        window.addEventListener("languagechange", () => {
+          // Only auto-switch if user hasn't explicitly chosen a language in this session
+          if (!localStorage.getItem("lang")) changeLanguage(getInitialLang());
+        });
+      })();
+    </script>
+  </body>
+</html>

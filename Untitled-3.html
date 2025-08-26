@@ -1,0 +1,8 @@
+// script.js
+const buttons = document.querySelectorAll('.actions button');
+
+buttons.forEach(button => {
+  button.addEventListener('click', () => {
+    alert(`Bạn đã nhấn ${button.textContent}`);
+  });
+});

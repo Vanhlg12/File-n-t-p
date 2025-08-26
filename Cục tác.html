@@ -1,0 +1,165 @@
+// File: frontend/index.html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Arcadia University Admissions</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <div class="brand">Arcadia <span>Admissions</span></div>
+            <nav>
+                <button id="openApply" class="btn ghost">Apply</button>
+                <button id="openStatus" class="btn ghost">Check Status</button>
+                <button id="openAdmin" class="btn primary">Admin</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-grid">
+                <div class="hero-left">
+                    <h1>Start your journey at <span>Arcadia University</span></h1>
+                    <p>Apply to our undergraduate and graduate programs. Fast, transparent, and secure admissions.</p>
+                    <div class="cta-row">
+                        <button id="heroApply" class="btn big">Apply Now</button>
+                        <a href="#programs" class="link">Explore Programs →</a>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="card glass animate-rise">
+                        <h3>Why Arcadia?</h3>
+                        <ul>
+                            <li>Top faculty & small class sizes</li>
+                            <li>Active career center & internships</li>
+                            <li>Financial aid & scholarships available</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="programs" class="container programs">
+            <h2>Featured Programs</h2>
+            <div class="program-grid">
+                <article class="program card animate-pop">
+                    <h3>Computer Science</h3>
+                    <p>AI, systems, and software engineering tracks.</p>
+                    <div class="pill">Undergraduate & Graduate</div>
+                </article>
+
+                <article class="program card animate-pop delay-1">
+                    <h3>Business & Management</h3>
+                    <p>Entrepreneurship and data-driven decision making.</p>
+                    <div class="pill">Undergraduate</div>
+                </article>
+
+                <article class="program card animate-pop delay-2">
+                    <h3>Design & Media</h3>
+                    <p>Studios, UX, and digital production.</p>
+                    <div class="pill">Undergraduate</div>
+                </article>
+            </div>
+        </section>
+
+        <section class="container how-it-works">
+            <h2>How It Works</h2>
+            <ol>
+                <li>Create an account & complete the form</li>
+                <li>Upload transcripts & supporting documents</li>
+                <li>Receive decisions online & by email</li>
+            </ol>
+        </section>
+
+        <div id="applyModal" class="modal" aria-hidden="true">
+            <div class="modal-content">
+                <button class="modal-close" data-target="applyModal">×</button>
+                <h2>Application Form</h2>
+                <form id="applicationForm" enctype="multipart/form-data">
+                    <div class="grid-2">
+                        <label>First name <input name="firstName" required></label>
+                        <label>Last name <input name="lastName" required></label>
+                        <label>Email <input type="email" name="email" required></label>
+                        <label>Phone <input name="phone" required pattern="[0-9()+\-\s]{7,20}"></label>
+                    </div>
+
+                    <label>Program
+                        <select name="program" required>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Business">Business</option>
+                            <option value="Design">Design</option>
+                        </select>
+                    </label>
+
+                    <label>Personal statement
+                        <textarea name="statement" rows="5" required minlength="100"
+                            placeholder="At least 100 characters..."></textarea>
+                    </label>
+
+                    <label>Transcript (PDF) <input type="file" name="transcript" accept="application/pdf"
+                            required></label>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn primary">Submit Application</button>
+                        <button type="button" class="btn ghost" data-target="applyModal">Cancel</button>
+                    </div>
+
+                    <div id="applyFeedback" class="feedback" aria-live="polite"></div>
+                </form>
+            </div>
+        </div>
+
+        <div id="statusModal" class="modal" aria-hidden="true">
+            <div class="modal-content">
+                <button class="modal-close" data-target="statusModal">×</button>
+                <h2>Check Application Status</h2>
+                <form id="statusForm">
+                    <label>Email <input type="email" name="email" required></label>
+                    <label>Application ID <input name="appId" required></label>
+                    <div class="form-actions">
+                        <button class="btn primary">Check Status</button>
+                    </div>
+                    <div id="statusResult" class="feedback" aria-live="polite"></div>
+                </form>
+            </div>
+        </div>
+
+        <div id="adminModal" class="modal" aria-hidden="true">
+            <div class="modal-content large">
+                <button class="modal-close" data-target="adminModal">×</button>
+                <h2>Admissions Panel</h2>
+                <div id="adminLogin">
+                    <form id="adminLoginForm">
+                        <label>Admin Password <input type="password" name="password" required></label>
+                        <div class="form-actions"><button class="btn primary">Login</button></div>
+                        <div id="adminLoginFeedback" class="feedback"></div>
+                    </form>
+                </div>
+
+                <div id="adminArea" hidden>
+                    <div class="admin-top">
+                        <input id="adminSearch" placeholder="Search by name, email or id..." />
+                        <button id="logoutAdmin" class="btn ghost">Logout</button>
+                    </div>
+                    <div id="applicationsList" class="applications-list"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">© <span id="year"></span> Arcadia University • Admissions</div>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+
+</html>

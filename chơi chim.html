@@ -1,0 +1,442 @@
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    document.body.appendChild(canvas);
+
+    canvas.width = 320;
+    canvas.height = 480;
+
+    const bird = {
+      x: 50,
+      y: 150,
+      width: 20,
+      height: 20,
+      gravity: 0.6,
+      lift: -15,
+      velocity: 0,
+      draw() {
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      },
+      update() {
+        this.velocity += this.gravity;
+        this.y += this.velocity;
+
+        if (this.y + this.height > canvas.height) {
+          this.y = canvas.height - this.height;
+          this.velocity = 0;
+        }
+
+        if (this.y < 0) {
+          this.y = 0;
+          this.velocity = 0;
+        }
+      },
+      flap() {
+        this.velocity += this.lift;
+      }
+    };
+
+    const pipes = [];
+    const pipeWidth = 40;
+    const pipeGap = 120;
+    let frameCount = 0;
+
+    function createPipe() {
+      const pipeHeight = Math.random() * (canvas.height - pipeGap - 20) + 10;
+      pipes.push({
+        x: canvas.width,
+        top: pipeHeight,
+        bottom: canvas.height - pipeHeight - pipeGap,
+        draw() {
+          ctx.fillStyle = 'green';
+          ctx.fillRect(this.x, 0, pipeWidth, this.top);
+          ctx.fillRect(this.x, canvas.height - this.bottom, pipeWidth, this.bottom);
+        },
+        update() {
+          this.x -= 2;
+        }
+      });
+    }
+
+    function checkCollision(pipe) {
+      if (
+        bird.x < pipe.x + pipeWidth &&
+        bird.x + bird.width > pipe.x &&
+        (bird.y < pipe.top || bird.y + bird.height > canvas.height - pipe.bottom)
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      bird.update();
+      bird.draw();
+
+      if (frameCount % 100 === 0) {
+        createPipe();
+      }
+
+      pipes.forEach((pipe, index) => {
+        pipe.update();
+        pipe.draw();
+
+        if (checkCollision(pipe)) {
+          alert('Game Over!');
+          document.location.reload();
+        }
+
+        if (pipe.x + pipeWidth < 0) {
+          pipes.splice(index, 1);
+        }
+      });
+
+      frameCount++;
+      requestAnimationFrame(gameLoop);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        bird.flap();
+      }
+    });
+
+    gameLoop();
+  });
+</script>
+<style>
+  body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    background-color: #87CEEB;
+  }
+
+  canvas {
+    border: 2px solid #000;
+    background-color: #ADD8E6;
+  }
+
+  #game-over {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  #game-over h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+  }
+
+  #game-over button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #game-over button:hover {
+    background-color: #45a049;
+  }
+
+  #score {
+    font-size: 20px;
+    color: #333;
+    margin-top: 10px;
+  }
+</style>
+
+<div id="game-over">
+  <h1>Game Over!</h1>
+  <p id="final-score"></p>
+  <button id="restart-btn">Play Again</button>
+</div>
+
+<div id="score">Score: 0</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const gameOverScreen = document.getElementById('game-over');
+    const restartBtn = document.getElementById('restart-btn');
+    const scoreDisplay = document.getElementById('score');
+    const finalScoreDisplay = document.getElementById('final-score');
+    let score = 0;
+    let gameRunning = true;
+
+    function endGame() {
+      gameRunning = false;
+      gameOverScreen.style.display = 'flex';
+      finalScoreDisplay.textContent = `Your Score: ${score}`;
+    }
+
+    restartBtn.addEventListener('click', () => {
+      document.location.reload();
+    });
+
+    function gameLoop() {
+      if (!gameRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      bird.update();
+      bird.draw();
+
+      if (frameCount % 100 === 0) {
+        createPipe();
+      }
+
+      pipes.forEach((pipe, index) => {
+        pipe.update();
+        pipe.draw();
+
+        if (checkCollision(pipe)) {
+          endGame();
+        }
+
+        if (pipe.x + pipeWidth < 0) {
+          pipes.splice(index, 1);
+          score++;
+          scoreDisplay.textContent = `Score: ${score}`;
+        }
+      });
+
+      frameCount++;
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  });
+</script>
+<div id="menu">
+  <h1>Flappy Bird</h1>
+  <button id="start-btn">Start Game</button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const menu = document.getElementById('menu');
+    const startBtn = document.getElementById('start-btn');
+    const gameOverScreen = document.getElementById('game-over');
+    const restartBtn = document.getElementById('restart-btn');
+    const scoreDisplay = document.getElementById('score');
+    const finalScoreDisplay = document.getElementById('final-score');
+    let score = 0;
+    let gameRunning = false;
+
+    function showMenu() {
+      menu.style.display = 'flex';
+      gameOverScreen.style.display = 'none';
+      scoreDisplay.style.display = 'none';
+    }
+
+    function startGame() {
+      menu.style.display = 'none';
+      scoreDisplay.style.display = 'block';
+      gameRunning = true;
+      score = 0;
+      pipes.length = 0;
+      bird.y = 150;
+      bird.velocity = 0;
+      frameCount = 0;
+      scoreDisplay.textContent = `Score: ${score}`;
+      gameLoop();
+    }
+
+    function endGame() {
+      gameRunning = false;
+      gameOverScreen.style.display = 'flex';
+      finalScoreDisplay.textContent = `Your Score: ${score}`;
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', showMenu);
+
+    function gameLoop() {
+      if (!gameRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      bird.update();
+      bird.draw();
+
+      if (frameCount % 100 === 0) {
+        createPipe();
+      }
+
+      pipes.forEach((pipe, index) => {
+        pipe.update();
+        pipe.draw();
+
+        if (checkCollision(pipe)) {
+          endGame();
+        }
+
+        if (pipe.x + pipeWidth < 0) {
+          pipes.splice(index, 1);
+          score++;
+          scoreDisplay.textContent = `Score: ${score}`;
+        }
+      });
+
+      frameCount++;
+      requestAnimationFrame(gameLoop);
+    }
+
+    showMenu();
+  });
+</script>
+
+<style>
+  #menu {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  #menu h1 {
+    margin: 0;
+    font-size: 32px;
+    color: #333;
+  }
+
+  #menu button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #menu button:hover {
+    background-color: #45a049;
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const menu = document.getElementById('menu');
+    const startBtn = document.getElementById('start-btn');
+    const gameOverScreen = document.getElementById('game-over');
+    const restartBtn = document.getElementById('restart-btn');
+    const scoreDisplay = document.getElementById('score');
+    const finalScoreDisplay = document.getElementById('final-score');
+    let score = 0;
+    let gameRunning = false;
+
+    function showMenu() {
+      menu.style.display = 'flex';
+      gameOverScreen.style.display = 'none';
+      scoreDisplay.style.display = 'none';
+      gameRunning = false;
+    }
+
+    function startGame() {
+      menu.style.display = 'none';
+      scoreDisplay.style.display = 'block';
+      gameRunning = true;
+      score = 0;
+      pipes.length = 0;
+      bird.y = 150;
+      bird.velocity = 0;
+      frameCount = 0;
+      scoreDisplay.textContent = `Score: ${score}`;
+      gameLoop();
+    }
+
+    function endGame() {
+      gameRunning = false;
+      gameOverScreen.style.display = 'flex';
+      finalScoreDisplay.textContent = `Your Score: ${score}`;
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', showMenu);
+
+    function gameLoop() {
+      if (!gameRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      bird.update();
+      bird.draw();
+
+      if (frameCount % 100 === 0) {
+        createPipe();
+      }
+
+      pipes.forEach((pipe, index) => {
+        pipe.update();
+        pipe.draw();
+
+        if (checkCollision(pipe)) {
+          endGame();
+        }
+
+        if (pipe.x + pipeWidth < 0) {
+          pipes.splice(index, 1);
+          score++;
+          scoreDisplay.textContent = `Score: ${score}`;
+        }
+      });
+
+      frameCount++;
+      requestAnimationFrame(gameLoop);
+    }
+
+    showMenu();
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyA') {
+        bird.x -= 10; // Move left
+      } else if (e.code === 'KeyD') {
+        bird.x += 10; // Move right
+      } else if (e.code === 'KeyW') {
+        bird.flap(); // Jump
+      } else if (e.code === 'KeyS') {
+        gameRunning = false; // Pause the game
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.code === 'KeyS') {
+        gameRunning = true; // Resume the game
+        gameLoop();
+      }
+    });
+  });
+</script>

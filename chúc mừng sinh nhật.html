@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chúc mừng sinh nhật!</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <style>
+    /* Reset cơ bản */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* Toàn trang với nền gradient */
+    body {
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      font-family: 'Great Vibes', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Khung chính chứa dòng chữ */
+    .message-box {
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .message-box h1 {
+      font-size: 4rem;
+      margin-bottom: 0.2em;
+    }
+    .message-box p {
+      font-size: 1.5rem;
+    }
+
+    /* Canvas để vẽ confetti */
+    #confetti {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Bong bóng */
+    .balloon {
+      position: absolute;
+      bottom: -150px;
+      width: 60px; height: 80px;
+      border-radius: 50% 50% 50% 50%;
+      background: red;
+      opacity: 0.8;
+      animation: rise linear infinite;
+    }
+    @keyframes rise {
+      0%   { transform: translateY(0)   rotate(0deg); }
+      25%  { transform: translateY(-25vh) rotate(5deg); }
+      50%  { transform: translateY(-50vh) rotate(-5deg); }
+      75%  { transform: translateY(-75vh) rotate(5deg); }
+      100% { transform: translateY(-110vh) rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hộp thông điệp -->
+  <div class="message-box">
+    <h1>Chúc mừng sinh nhật!</h1>
+    <p>Chúc bạn có một ngày thật tuyệt vời và ngập tràn niềm vui!</p>
+  </div>
+
+  <!-- Canvas cho confetti -->
+  <canvas id="confetti"></canvas>
+
+  <script>
+    /* Tạo bong bóng bay lên */
+    const colors = ['#FF6B6B','#FFE66D','#4472CA','#43AA8B','#9B5DE5'];
+    function createBalloons(count = 20) {
+      for (let i = 0; i < count; i++) {
+        const b = document.createElement('div');
+        b.className = 'balloon';
+        const size = 40 + Math.random() * 40;
+        b.style.width = size + 'px';
+        b.style.height = size * 1.2 + 'px';
+        b.style.left = Math.random() * 100 + 'vw';
+        b.style.background = colors[Math.floor(Math.random() * colors.length)];
+        b.style.animationDuration = 5 + Math.random() * 7 + 's';
+        b.style.animationDelay = Math.random() * 3 + 's';
+        document.body.appendChild(b);
+      }
+    }
+    createBalloons(25);
+
+    /* Confetti trên canvas */
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    });
+
+    const confettiCount = 150;
+    const confettis = [];
+
+    function randomRange(min, max) { return Math.random() * (max - min) + min; }
+
+    function initConfetti() {
+      for (let i = 0; i < confettiCount; i++) {
+        confettis.push({
+          x: Math.random() * W,
+          y: Math.random() * H - H,
+          r: randomRange(5, 10),
+          d: randomRange(0.5, 1.5),
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+          tilt: randomRange(-10, 10),
+          tiltSpeed: randomRange(0.05, 0.12),
+          tiltAngle: 0
+        });
+      }
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, W, H);
+      confettis.forEach(f => {
+        ctx.beginPath();
+        ctx.lineWidth = f.r / 2;
+        ctx.strokeStyle = f.color;
+        ctx.moveTo(f.x + f.tilt + f.r/2, f.y);
+        ctx.lineTo(f.x + f.tilt, f.y + f.tilt + f.r/2);
+        ctx.stroke();
+      });
+    }
+
+    function updateConfetti() {
+      confettis.forEach((f, i) => {
+        f.tiltAngle += f.tiltSpeed;
+        f.y += (f.d + f.r / 10);
+        f.x += Math.sin(f.tiltAngle) * 2;
+        f.tilt = Math.cos(f.tiltAngle) * 15;
+
+        if (f.y > H) {
+          confettis[i] = {
+            x: Math.random() * W,
+            y: -20,
+            r: f.r,
+            d: f.d,
+            color: f.color,
+            tilt: f.tilt,
+            tiltSpeed: f.tiltSpeed,
+            tiltAngle: f.tiltAngle
+          };
+        }
+      });
+    }
+
+    function animate() {
+      drawConfetti();
+      updateConfetti();
+      requestAnimationFrame(animate);
+    }
+
+    initConfetti();
+    animate();
+  </script>
+</body>
+</html>

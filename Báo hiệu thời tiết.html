@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Professional Weather Forecast</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #007bff;
+      }
+      .input-section {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      input[type="text"] {
+        padding: 10px;
+        width: 200px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      select {
+        padding: 10px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .current-weather {
+        margin-bottom: 40px;
+      }
+      .current-weather h2 {
+        margin-bottom: 10px;
+      }
+      .current-weather p {
+        margin: 5px 0;
+      }
+      .forecast {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f8f9fa;
+      }
+      .error {
+        color: red;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Professional Weather Forecast</h1>
+      <div class="input-section">
+        <input
+          type="text"
+          id="cityInput"
+          placeholder="Enter city name (e.g., London)"
+        />
+        <select id="unitsSelect">
+          <option value="metric">Celsius (°C)</option>
+          <option value="imperial">Fahrenheit (°F)</option>
+        </select>
+        <button id="fetchButton">Get Forecast</button>
+      </div>
+      <div id="errorMessage" class="error"></div>
+      <div id="currentWeather" class="current-weather"></div>
+      <div id="forecast" class="forecast"></div>
+    </div>
+
+    <script>
+      const API_KEY = "YOUR_API_KEY_HERE"; // Replace with your OpenWeatherMap API key: https://openweathermap.org/api
+
+      document.getElementById("fetchButton").addEventListener("click", () => {
+        const city = document.getElementById("cityInput").value.trim();
+        const units = document.getElementById("unitsSelect").value;
+        if (!city) {
+          showError("Please enter a city name.");
+          return;
+        }
+        fetchWeather(city, units);
+      });
+
+      function showError(message) {
+        document.getElementById("errorMessage").textContent = message;
+        clearDisplays();
+      }
+
+      function clearDisplays() {
+        document.getElementById("currentWeather").innerHTML = "";
+        document.getElementById("forecast").innerHTML = "";
+      }
+
+      async function fetchWeather(city, units) {
+        document.getElementById("errorMessage").textContent = "";
+        clearDisplays();
+
+        try {
+          const currentData = await fetchCurrentWeather(city, units);
+          displayCurrentWeather(currentData, units);
+
+          const forecastData = await fetchForecast(city, units);
+          displayForecast(forecastData, units);
+        } catch (error) {
+          showError(
+            "Error fetching weather data. Please check the city name and try again."
+          );
+        }
+      }
+
+      async function fetchCurrentWeather(city, units) {
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${units}&appid=${API_KEY}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch current weather");
+        return response.json();
+      }
+
+      async function fetchForecast(city, units) {
+        const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=${units}&appid=${API_KEY}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch forecast");
+        return response.json();
+      }
+
+      function displayCurrentWeather(data, units) {
+        const tempUnit = units === "metric" ? "°C" : "°F";
+        const windUnit = units === "metric" ? "m/s" : "mph";
+        const date = new Date(data.dt * 1000).toLocaleString();
+
+        const html = `
+                <h2>Current Weather in ${data.name}, ${data.sys.country}</h2>
+                <p><strong>Date/Time:</strong> ${date}</p>
+                <p><strong>Condition:</strong> ${
+                  data.weather[0].description.charAt(0).toUpperCase() +
+                  data.weather[0].description.slice(1)
+                }</p>
+                <p><strong>Temperature:</strong> ${
+                  data.main.temp
+                } ${tempUnit}</p>
+                <p><strong>Feels Like:</strong> ${
+                  data.main.feels_like
+                } ${tempUnit}</p>
+                <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+                <p><strong>Wind Speed:</strong> ${
+                  data.wind.speed
+                } ${windUnit}</p>
+                <p><strong>Pressure:</strong> ${data.main.pressure} hPa</p>
+            `;
+        document.getElementById("currentWeather").innerHTML = html;
+      }
+
+      function displayForecast(data, units) {
+        const tempUnit = units === "metric" ? "°C" : "°F";
+        let html = "<h2>5-Day Forecast (3-hour intervals)</h2>";
+        html +=
+          "<table><thead><tr><th>Date/Time</th><th>Condition</th><th>Temp</th><th>Humidity</th><th>Wind</th></tr></thead><tbody>";
+
+        data.list.slice(0, 40).forEach((item) => {
+          const date = new Date(item.dt * 1000).toLocaleString();
+          const condition =
+            item.weather[0].description.charAt(0).toUpperCase() +
+            item.weather[0].description.slice(1);
+          html += `<tr>
+                    <td>${date}</td>
+                    <td>${condition}</td>
+                    <td>${item.main.temp} ${tempUnit}</td>
+                    <td>${item.main.humidity}%</td>
+                    <td>${item.wind.speed}</td>
+                </tr>`;
+        });
+
+        html += "</tbody></table>";
+        document.getElementById("forecast").innerHTML = html;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Translator • Offline UI + Google-style features</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #fff;
+        --muted: #6b7785;
+        --accent: #1a73e8;
+        --good: #10b981;
+        --danger: #ef4444;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, Segoe UI, Roboto, Arial;
+        background: var(--bg);
+        color: #0f1724;
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 18px auto;
+        padding: 18px;
+      }
+      header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--accent), #63a4ff);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+      }
+      h1 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 0;
+        background: var(--card);
+        box-shadow: 0 4px 12px rgba(15, 23, 36, 0.06);
+        cursor: pointer;
+      }
+      .btn.primary {
+        background: linear-gradient(135deg, var(--accent), #0b57d0);
+        color: #fff;
+      }
+      .panel {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 6px 24px rgba(15, 23, 36, 0.06);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 14px;
+      }
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      select,
+      textarea,
+      input {
+        font-family: inherit;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      textarea {
+        width: 100%;
+        min-height: 160px;
+        border-radius: 10px;
+        padding: 12px;
+        border: 1px solid #e6edf3;
+      }
+      .small {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .lang-select {
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid #e6edf3;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .history {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .history .item {
+        padding: 8px;
+        border-radius: 8px;
+        background: #fbfeff;
+        border: 1px solid #e6f0ff;
+        font-size: 13px;
+      }
+      .altlist {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .alt {
+        padding: 8px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px dashed #e6edf3;
+        cursor: pointer;
+      }
+      .label {
+        font-weight: 700;
+        color: #102a43;
+      }
+      footer {
+        margin-top: 18px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="brand">
+          <div class="logo">T</div>
+          <div>
+            <h1>Translator • Google‑style features</h1>
+            <div class="small">
+              Auto-detect, TTS, voice input, conversation mode, history, export
+            </div>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="btnSwap">Swap ↔</button>
+          <button class="btn" id="btnDetect">Detect</button>
+          <button class="btn primary" id="btnTranslate">Translate</button>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="grid">
+          <div>
+            <div class="row" style="justify-content: space-between">
+              <div class="row">
+                <label class="label">From</label>
+                <select id="sourceLanguage" class="lang-select">
+                  <option value="auto">Auto‑detect</option>
+                  <option value="en">English</option>
+                  <option value="vi">Vietnamese</option>
+                  <option value="ja">Japanese</option>
+                  <option value="zh">Chinese</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+              <div class="meta small">
+                <button class="btn" id="micInput">🎙️</button>
+                <button class="btn" id="ttsInput">🔊</button>
+              </div>
+            </div>
+            <textarea
+              id="inputText"
+              placeholder="Type or speak. Auto-detect available."
+            ></textarea>
+            <div
+              class="row"
+              style="
+                margin-top: 8px;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <div class="small">
+                Detected: <span id="detected" style="font-weight: 700">—</span>
+              </div>
+              <div class="row">
+                <button class="btn" id="btnCopyIn">Copy</button>
+                <button class="btn" id="saveHistory">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="row" style="justify-content: space-between">
+              <div class="row">
+                <label class="label">To</label>
+                <select id="targetLanguage" class="lang-select">
+                  <option value="vi">Vietnamese</option>
+                  <option value="en">English</option>
+                  <option value="ja">Japanese</option>
+                  <option value="zh">Chinese</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+              <div class="meta small">
+                <button class="btn" id="micConv">🎧 Conv</button>
+                <button class="btn" id="ttsOutput">🔊</button>
+              </div>
+            </div>
+            <textarea
+              id="outputText"
+              readonly
+              placeholder="Translation appears here"
+            ></textarea>
+
+            <div
+              class="row"
+              style="
+                margin-top: 8px;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <div class="small">Alternatives</div>
+              <div class="row">
+                <button class="btn" id="btnCopyOut">Copy</button>
+                <button class="btn" id="btnExport">Export</button>
+              </div>
+            </div>
+
+            <div class="altlist" id="alts"></div>
+          </div>
+        </div>
+
+        <div
+          class="row"
+          style="margin-top: 12px; gap: 12px; align-items: flex-start"
+        >
+          <div style="flex: 1">
+            <div class="label">History</div>
+            <div class="history" id="history"></div>
+          </div>
+          <div style="width: 320px">
+            <div class="label">Conversation (live)</div>
+            <div
+              class="panel"
+              id="convPanel"
+              style="min-height: 160px; overflow: auto"
+            ></div>
+            <div
+              class="row"
+              style="margin-top: 8px; justify-content: space-between"
+            >
+              <button class="btn" id="startConv">Start Conversation</button>
+              <button class="btn" id="stopConv">Stop</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        Works offline for UI. Translation uses Google Translate endpoint.
+        Microphone/TTS require browser permissions.
+      </footer>
+    </div>
+
+    <script>
+      // Minimal enhancement to previous code: auto-detect, TTS, voice input, conversation mode, alt suggestions, history, export
+      const selSrc = document.getElementById("sourceLanguage");
+      const selTgt = document.getElementById("targetLanguage");
+      const inTxt = document.getElementById("inputText");
+      const outTxt = document.getElementById("outputText");
+      const detectedLabel = document.getElementById("detected");
+      const alts = document.getElementById("alts");
+      const historyEl = document.getElementById("history");
+      let HISTORY = JSON.parse(localStorage.getItem("trans_history") || "[]");
+      let convRec;
+      let convMode = false;
+
+      function renderHistory() {
+        historyEl.innerHTML = "";
+        HISTORY.slice()
+          .reverse()
+          .forEach((h) => {
+            const d = document.createElement("div");
+            d.className = "item";
+            d.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${
+              h.src
+            }</strong> → <em>${
+              h.tgt
+            }</em><div style='font-size:12px;color:var(--muted)'>${
+              h.detected || ""
+            }</div></div><div><button class='btn' onclick='replay(${HISTORY.indexOf(
+              h
+            )})'>Use</button></div></div>`;
+            historyEl.appendChild(d);
+          });
+      }
+      function replay(idx) {
+        const item = HISTORY[idx];
+        if (!item) return;
+        inTxt.value = item.src;
+        selTgt.value = item.tgt;
+        selSrc.value = item.detected || "auto";
+        translate();
+      }
+
+      async function detectLanguage(text) {
+        // use google endpoint with sl=auto and return detected from response if possible
+        try {
+          const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=bd&dt=ex&dt=md&q=${encodeURIComponent(
+            text
+          )}`;
+          const res = await fetch(url);
+          const data = await res.json();
+          // Attempt to read detected language; translate_a doesn't always return detection metadata. We'll try data[2]
+          if (data && data[2] && data[2][0] && data[2][0][0])
+            return data[2][0][0];
+        } catch (e) {}
+        return null;
+      }
+
+      async function translate(direction = "forward") {
+        const source = selSrc.value;
+        const target = selTgt.value;
+        const text = inTxt.value.trim();
+        if (!text) return;
+        detectedLabel.textContent = "...";
+        // call google translate (unofficial) with sl=auto if source=auto
+        const sl = source === "auto" ? "auto" : source;
+        try {
+          const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${target}&dt=t&dt=rm&dt=at&q=${encodeURIComponent(
+            text
+          )}`;
+          const res = await fetch(url);
+          const data = await res.json();
+          // assembled translation
+          const translated = data[0].map((seg) => seg[0]).join("");
+          outTxt.value = translated;
+          // detected language
+          const detected =
+            data[2] && data[2][0] && data[2][0][0]
+              ? data[2][0][0]
+              : source === "auto"
+              ? "unknown"
+              : source;
+          detectedLabel.textContent = detected;
+          // alternatives / corrections
+          alts.innerHTML = "";
+          if (Array.isArray(data[5])) {
+            // sometimes contains alternatives
+            data[5].forEach((rec) => {
+              const node = document.createElement("div");
+              node.className = "alt";
+              node.textContent = rec[0];
+              node.onclick = () => {
+                outTxt.value = rec[0];
+              };
+              alts.appendChild(node);
+            });
+          }
+          // save to history
+          HISTORY.push({
+            src: text,
+            tgt: translated,
+            detected: detected,
+            langTo: target,
+            time: Date.now(),
+          });
+          if (HISTORY.length > 200) HISTORY.shift();
+          localStorage.setItem("trans_history", JSON.stringify(HISTORY));
+          renderHistory();
+        } catch (err) {
+          console.error(err);
+          alert("Translate failed");
+          detectedLabel.textContent = "-";
+        }
+      }
+
+      // features: buttons
+      document.getElementById("btnTranslate").onclick = () => translate();
+      document.getElementById("btnSwap").onclick = () => {
+        const a = selSrc.value;
+        selSrc.value = selTgt.value;
+        selTgt.value = a;
+        const t = inTxt.value;
+        inTxt.value = outTxt.value;
+        outTxt.value = t;
+      };
+      document.getElementById("btnDetect").onclick = async () => {
+        const d = await detectLanguage(inTxt.value);
+        detectedLabel.textContent = d || "-";
+      };
+      document.getElementById("btnCopyIn").onclick = () => {
+        navigator.clipboard.writeText(inTxt.value);
+        alert("Copied");
+      };
+      document.getElementById("btnCopyOut").onclick = () => {
+        navigator.clipboard.writeText(outTxt.value);
+        alert("Copied");
+      };
+      document.getElementById("saveHistory").onclick = () => {
+        HISTORY.push({
+          src: inTxt.value,
+          tgt: outTxt.value,
+          detected: detectedLabel.textContent,
+          langTo: selTgt.value,
+          time: Date.now(),
+        });
+        localStorage.setItem("trans_history", JSON.stringify(HISTORY));
+        renderHistory();
+      };
+
+      // Export translation as .txt
+      document.getElementById("btnExport").onclick = () => {
+        const blob = new Blob(
+          [
+            `Source (${selSrc.value}):\n${inTxt.value}\n\nTarget (${selTgt.value}):\n${outTxt.value}`,
+          ],
+          { type: "text/plain" }
+        );
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "translation.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      // TTS
+      function speak(text, lang) {
+        try {
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang =
+            lang === "vi"
+              ? "vi-VN"
+              : lang === "ja"
+              ? "ja-JP"
+              : lang === "zh"
+              ? "zh-CN"
+              : lang === "de"
+              ? "de-DE"
+              : "en-US";
+          speechSynthesis.cancel();
+          speechSynthesis.speak(utter);
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+      document.getElementById("ttsInput").onclick = () =>
+        speak(inTxt.value, selSrc.value === "auto" ? "en" : selSrc.value);
+      document.getElementById("ttsOutput").onclick = () =>
+        speak(outTxt.value, selTgt.value);
+
+      // Voice input (single utterance)
+      let recognition;
+      function startMic() {
+        if (
+          !(
+            "webkitSpeechRecognition" in window || "SpeechRecognition" in window
+          )
+        ) {
+          alert("SpeechRecognition not supported");
+          return;
+        }
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SR();
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        recognition.onresult = async (e) => {
+          const t = e.results[0][0].transcript;
+          inTxt.value = t;
+          await translate();
+        };
+        recognition.onerror = () => {};
+        recognition.start();
+      }
+      document.getElementById("micInput").onclick = () => startMic();
+
+      // Conversation mode: alternate recognition and translate and append to convPanel
+      const convPanel = document.getElementById("convPanel");
+      let convRecognition;
+      async function startConversation() {
+        if (
+          !(
+            "webkitSpeechRecognition" in window || "SpeechRecognition" in window
+          )
+        ) {
+          alert("SpeechRecognition not supported");
+          return;
+        }
+        convMode = true;
+        convPanel.innerHTML = "";
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        convRecognition = new SR();
+        convRecognition.lang = "en-US";
+        convRecognition.interimResults = false;
+        convRecognition.continuous = true;
+        convRecognition.onresult = async (e) => {
+          for (let i = 0; i < e.results.length; i++) {
+            const t = e.results[i][0].transcript;
+            const node = document.createElement("div");
+            node.className = "item";
+            node.innerHTML = `<div style='font-weight:700'>You</div><div>${t}</div>`;
+            convPanel.appendChild(node); // translate
+            try {
+              const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${
+                selTgt.value
+              }&dt=t&q=${encodeURIComponent(t)}`;
+              const r = await fetch(url);
+              const d = await r.json();
+              const translated = d[0].map((s) => s[0]).join("");
+              const bot = document.createElement("div");
+              bot.className = "item";
+              bot.style.background = "#f0f9ff";
+              bot.innerHTML = `<div style='font-weight:700'>Translation</div><div>${translated}</div>`;
+              convPanel.appendChild(bot);
+              convPanel.scrollTop = convPanel.scrollHeight;
+            } catch (err) {
+              console.warn(err);
+            }
+          }
+        };
+        convRecognition.onerror = (e) => {
+          console.warn(e);
+        };
+        convRecognition.start();
+        document.getElementById("startConv").disabled = true;
+        document.getElementById("stopConv").disabled = false;
+      }
+      function stopConversation() {
+        if (convRecognition)
+          try {
+            convRecognition.stop();
+          } catch (e) {}
+        convMode = false;
+        document.getElementById("startConv").disabled = false;
+        document.getElementById("stopConv").disabled = true;
+      }
+
+      document.getElementById("startConv").onclick = startConversation;
+      document.getElementById("stopConv").onclick = stopConversation;
+
+      document.getElementById("micConv").onclick = () => {
+        if (convMode) stopConversation();
+        else startConversation();
+      };
+
+      // Auto-translate while typing (debounce)
+      let to;
+      inTxt.addEventListener("input", () => {
+        clearTimeout(to);
+        to = setTimeout(() => translate(), 700);
+      });
+
+      // init
+      renderHistory();
+    </script>
+  </body>
+</html>

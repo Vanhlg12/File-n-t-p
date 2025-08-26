@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Professional Weather Forecast</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f0f4f8;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 400px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #0077ff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #005fcc;
+      }
+      .weather {
+        margin-top: 24px;
+        text-align: center;
+      }
+      .weather-icon {
+        width: 80px;
+      }
+      .error {
+        color: #d00;
+        text-align: center;
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Weather Forecast</h2>
+      <form id="weatherForm">
+        <label for="city">Select Country and Enter City Name:</label>
+        <select id="country" name="country" required>
+            <option value="">🌍 Select Country</option>
+          <option value="AF">Afghanistan</option>
+          <option value="AL">Albania</option>
+          <option value="DZ">Algeria</option>
+          <option value="AR">Argentina</option>
+          <option value="AU">Australia</option>
+          <option value="AT">Austria</option>
+          <option value="BD">Bangladesh</option>
+          <option value="BE">Belgium</option>
+          <option value="BR">Brazil</option>
+          <option value="CA">Canada</option>
+          <option value="CN">China</option>
+          <option value="CO">Colombia</option>
+          <option value="EG">Egypt</option>
+      document
+        .getElementById("weatherForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const city = document.getElementById("city").value.trim();
+          const country = document.getElementById("country").value;
+          const weatherResult = document.getElementById("weatherResult");
+          const errorMsg = document.getElementById("errorMsg");
+          weatherResult.innerHTML = "";
+          errorMsg.textContent = "";
+
+          if (!city || !country) {
+            errorMsg.textContent = "Please select a country and enter a city name.";
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+                city
+              )},${country}&appid=${apiKey}&units=metric`
+            );
+            if (!res.ok) throw new Error("City not found");
+            const data = await res.json();
+            weatherResult.innerHTML = `
+                    <img class="weather-icon" src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="${data.weather[0].description}">
+                    <h3>${data.name}, ${data.sys.country}</h3>
+                    <p><strong>${data.weather[0].main}</strong> - ${data.weather[0].description}</p>
+                    <p>Temperature: ${data.main.temp}°C (Feels like: ${data.main.feels_like}°C)</p>
+                    <p>Min: ${data.main.temp_min}°C / Max: ${data.main.temp_max}°C</p>
+                    <p>Humidity: ${data.main.humidity}%</p>
+                    <p>Pressure: ${data.main.pressure} hPa</p>
+                    <p>Wind: ${data.wind.speed} m/s, Direction: ${data.wind.deg}°</p>
+                    <p>Visibility: ${data.visibility} meters</p>
+                    <p>Cloudiness: ${data.clouds.all}%</p>
+                    <p>Sunrise: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString()}</p>
+                    <p>Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}</p>
+                `;
+          } catch (err) {
+            errorMsg.textContent =
+              "Could not retrieve weather data. Please check the city and country.";
+          }
+        });
+      document
+        .getElementById("weatherForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const city = document.getElementById("city").value.trim();
+          const weatherResult = document.getElementById("weatherResult");
+          const errorMsg = document.getElementById("errorMsg");
+          weatherResult.innerHTML = "";
+          errorMsg.textContent = "";
+
+          if (!city) {
+            errorMsg.textContent = "Please enter a city name.";
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+                city
+              )}&appid=${apiKey}&units=metric`
+            );
+            if (!res.ok) throw new Error("City not found");
+            const data = await res.json();
+            weatherResult.innerHTML = `
+                    <img class="weather-icon" src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="${data.weather[0].description}">
+                    <h3>${data.name}, ${data.sys.country}</h3>
+                    <p><strong>${data.weather[0].main}</strong> - ${data.weather[0].description}</p>
+                    <p>Temperature: ${data.main.temp}°C</p>
+                    <p>Humidity: ${data.main.humidity}%</p>
+                    <p>Wind: ${data.wind.speed} m/s</p>
+                `;
+          } catch (err) {
+            errorMsg.textContent =
+              "Could not retrieve weather data. Please check the city name.";
+          }
+        });
+    </script>
+  </body>
+</html>

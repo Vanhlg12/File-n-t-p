@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Language Translator</title>
+    <meta name="description" content="A simple multi-language translator that supports English, Vietnamese, Japanese, Chinese, and German.">
+    <meta name="keywords" content="translator, multi-language, English, Vietnamese, Japanese, Chinese, German, translate">
+    <meta name="author" content="Your Name">    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        select {
+            padding: 5px;
+            margin: 5px 0;
+        }
+        .language-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .language-btn {
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multi-Language Translator</h1>
+    
+    <div class="language-buttons">
+        <button class="language-btn" onclick="changeLanguage('en')">English</button>
+        <button class="language-btn" onclick="changeLanguage('vi')">Tiếng Việt</button>
+        <button class="language-btn" onclick="changeLanguage('ja')">日本語</button>
+        <button class="language-btn" onclick="changeLanguage('zh')">中文</button>
+        <button class="language-btn" onclick="changeLanguage('de')">Deutsch</button>
+    </div>
+
+    <div class="container">
+        <div style="flex: 1;">
+            <h3>Input Text:</h3>
+            <select id="sourceLanguage">
+                <option value="en">English</option>
+                <option value="vi">Vietnamese</option>
+                <option value="ja">Japanese</option>
+                <option value="zh">Chinese</option>
+                <option value="de">German</option>
+            </select>
+            <textarea id="inputText" placeholder="Enter text to translate"></textarea>
+        </div>
+        
+        <div style="flex: 1;">
+            <h3>Translated Text:</h3>
+            <select id="targetLanguage">
+                <option value="vi">Vietnamese</option>
+                <option value="en">English</option>
+                <option value="ja">Japanese</option>
+                <option value="zh">Chinese</option>
+                <option value="de">German</option>
+            </select>
+            <textarea id="outputText" readonly></textarea>
+        </div>
+    </div>
+
+    <button onclick="translateText()" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        Translate
+    </button>
+
+    <script>
+        function changeLanguage(lang) {
+            document.documentElement.lang = lang;
+            // You can add more UI language changes here
+        }
+
+        async function translateText(direction = 'forward') {
+            let inputText, sourceLanguage, targetLanguage, outputElement;
+            
+            if (direction === 'forward') {
+                inputText = document.getElementById('inputText').value.trim();
+                sourceLanguage = document.getElementById('sourceLanguage').value;
+                targetLanguage = document.getElementById('targetLanguage').value;
+                outputElement = document.getElementById('outputText');
+            } else {
+                inputText = document.getElementById('outputText').value.trim();
+                sourceLanguage = document.getElementById('targetLanguage').value;
+                targetLanguage = document.getElementById('sourceLanguage').value;
+                outputElement = document.getElementById('inputText');
+            }
+
+            if (!inputText) return;
+                const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLanguage}&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(inputText)}`);
+            try {
+                const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLanguage}&tl=${targetLanguage}&dt=t&q=${encodeURI(inputText)}`);
+                const data = await res.json();
+                const translatedText = data[0].map(item => item[0]).join('');
+                outputElement.value = translatedText;
+            } catch (error) {
+                alert('Translation failed. Please try again later.');
+                console.error('Translation error:', error);
+            }
+        }
+
+        // Auto-translate as user types in either box (with debounce)
+        let timeoutLeft, timeoutRight;
+        
+        document.getElementById('inputText').addEventListener('input', () => {
+            clearTimeout(timeoutLeft);
+            timeoutLeft = setTimeout(() => translateText('forward'), 1000);
+        });
+
+        document.getElementById('outputText').addEventListener('input', () => {
+            clearTimeout(timeoutRight);
+            timeoutRight = setTimeout(() => translateText('reverse'), 1000);
+        });
+    </script> 
+</body>
+</html></div>

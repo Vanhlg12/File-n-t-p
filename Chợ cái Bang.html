@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Product Showcase</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            color: #222;
+        }
+        header {
+            background: #4f46e5;
+            color: #fff;
+            padding: 2rem 1rem 1rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.1);
+            position: relative;
+        }
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 1rem auto;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border-radius: 2rem;
+            padding: 0.3rem 1rem;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.08);
+        }
+        .search-bar input {
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            padding: 0.5rem;
+            border-radius: 2rem;
+            background: transparent;
+            width: 180px;
+        }
+        .cart-btn {
+            background: #fff;
+            color: #4f46e5;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.5rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.08);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+        .cart-count {
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            width: 1.3rem;
+            height: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            animation: fadeInDown 1s;
+        }
+        header p {
+            margin-top: 0.5rem;
+            font-size: 1.2rem;
+            animation: fadeInDown 1.2s;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            padding: 3rem 1rem;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: 1.2rem;
+            box-shadow: 0 4px 24px rgba(79,70,229,0.08);
+            overflow: hidden;
+            width: 320px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+            animation: fadeInUp 0.8s;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(79,70,229,0.15);
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .product-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: filter 0.3s;
+        }
+        .product-card:hover .product-image {
+            filter: brightness(0.95) blur(1px);
+        }
+        .product-info {
+            padding: 1.5rem;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        .product-desc {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 1rem;
+            min-height: 48px;
+        }
+        .product-price {
+            font-size: 1.2rem;
+            color: #4f46e5;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .buy-btn, .add-cart-btn {
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.7rem 2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.08);
+            margin: 0.2rem 0;
+        }
+        .buy-btn:hover, .add-cart-btn:hover {
+            background: #3730a3;
+        }
+        @media (max-width: 900px) {
+            .products {
+                flex-direction: column;
+                align-items: center;
+            }
+            .header-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        /* Cart Modal */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .cart-modal.active {
+            display: flex;
+        }
+        .cart-content {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 2rem;
+            min-width: 320px;
+            max-width: 90vw;
+            box-shadow: 0 8px 32px rgba(79,70,229,0.15);
+            position: relative;
+        }
+        .cart-content h2 {
+            margin-top: 0;
+        }
+        .cart-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #4f46e5;
+            cursor: pointer;
+        }
+        .cart-items {
+            margin: 1rem 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.7rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        .cart-item-title {
+            font-weight: 600;
+        }
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .cart-total {
+            font-weight: 700;
+            color: #4f46e5;
+            margin-top: 1rem;
+            text-align: right;
+        }
+        .cart-empty {
+            color: #888;
+            text-align: center;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-bar">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()">
+            </div>
+            <button class="cart-btn" onclick="toggleCart()">
+                🛒 Cart
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </div>
+        <h1>Discover Our Best Products</h1>
+        <p>Beautiful, innovative, and made for you. Shop now and experience the difference!</p>
+    </header>
+    <main>
+        <section class="products" id="productsContainer">
+            <!-- Products will be rendered here -->
+        </section>
+    </main>
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <button class="cart-close" onclick="toggleCart()">&times;</button>
+            <h2>Your Cart</h2>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="cart-total" id="cartTotal"></div>
+        </div>
+    </div>
+    <script>
+        // Product Data
+        const products = [
+            {
+                title: "Smart Wireless Headphones",
+                desc: "Experience immersive sound and all-day comfort with our latest wireless headphones.",
+                price: 99,
+                image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
+                details: "Our Smart Wireless Headphones feature noise cancellation, 30-hour battery life, and touch controls."
+            },
+            {
+                title: "Elegant Wrist Watch",
+                desc: "Stay stylish and punctual with our elegant, water-resistant wrist watch.",
+                price: 149,
+                image: "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=600&q=80",
+                details: "This Elegant Wrist Watch is crafted with stainless steel and sapphire glass, perfect for any occasion."
+            },
+            {
+                title: "Modern Table Lamp",
+                desc: "Brighten your space with this energy-efficient, minimalist table lamp.",
+                price: 59,
+                image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+                details: "The Modern Table Lamp offers adjustable brightness and a sleek design for any room."
+            },
+            {
+                title: "Portable Bluetooth Speaker",
+                desc: "Take your music anywhere with this compact, waterproof Bluetooth speaker.",
+                price: 79,
+                image: "https://images.unsplash.com/photo-1512446733611-9099a758e082?auto=format&fit=crop&w=600&q=80",
+                details: "Enjoy powerful sound, 12-hour battery, and IPX7 waterproofing with this portable speaker."
+            },
+            {
+                title: "Ergonomic Office Chair",
+                desc: "Work in comfort with our adjustable, ergonomic office chair.",
+                price: 199,
+                image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=600&q=80",
+                details: "Features lumbar support, breathable mesh, and multi-angle adjustments for all-day comfort."
+            },
+            {
+                title: "Smart Fitness Tracker",
+                desc: "Track your health and fitness goals with this sleek wearable.",
+                price: 49,
+                image: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=600&q=80",
+                details: "Monitors heart rate, steps, sleep, and syncs with your smartphone."
+            },
+            {
+                title: "Wireless Charging Pad",
+                desc: "Charge your devices effortlessly with this fast wireless charging pad.",
+                price: 29,
+                image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80",
+                details: "Supports Qi-enabled devices, with overheat and overcharge protection."
+            },
+            {
+                title: "Minimalist Backpack",
+                desc: "Carry your essentials in style with this durable, minimalist backpack.",
+                price: 89,
+                image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+                details: "Water-resistant fabric, padded laptop sleeve, and multiple compartments."
+            }
+        ];
+
+        // Cart State
+        let cart = [];
+
+        // Render Products
+        function renderProducts(filter = "") {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = "";
+            let filtered = products
+                .map((p, i) => ({...p, idx: i}))
+                .filter(p => p.title.toLowerCase().includes(filter.toLowerCase()) || p.desc.toLowerCase().includes(filter.toLowerCase()));
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="color:#888;text-align:center;width:100%;">No products found.</div>`;
+                return;
+            }
+            filtered.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "product-card";
+                card.onclick = () => showDetails(product.idx);
+                card.innerHTML = `
+                    <img class="product-image" src="${product.image}" alt="${product.title}">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-title">${product.title}</div>
+                            <div class="product-desc">${product.desc}</div>
+                            <div class="product-price">$${product.price}</div>
+                        </div>
+                        <div>
+                            <button class="buy-btn" onclick="event.stopPropagation();alert('Thank you for your interest!')">Buy Now</button>
+                            <button class="add-cart-btn" onclick="event.stopPropagation();addToCart(${product.idx})">Add to Cart</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Show Product Details
+        function showDetails(idx) {
+            alert(products[idx].details);
+        }
+
+        // Search Filter
+        function filterProducts() {
+            const val = document.getElementById('searchInput').value;
+            renderProducts(val);
+        }
+
+        // Cart Functions
+        function addToCart(idx) {
+            const prod = products[idx];
+            const found = cart.find(item => item.idx === idx);
+            if (found) {
+                found.qty += 1;
+            } else {
+                cart.push({idx, qty: 1});
+            }
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            modal.classList.toggle('active');
+            if (modal.classList.contains('active')) {
+                renderCart();
+            }
+        }
+
+        function renderCart() {
+            const itemsDiv = document.getElementById('cartItems');
+            const totalDiv = document.getElementById('cartTotal');
+            if (cart.length === 0) {
+                itemsDiv.innerHTML = `<div class="cart-empty">Your cart is empty.</div>`;
+                totalDiv.textContent = "";
+                return;
+            }
+            let total = 0;
+            itemsDiv.innerHTML = "";
+            cart.forEach((item, i) => {
+                const prod = products[item.idx];
+                total += prod.price * item.qty;
+                const div = document.createElement('div');
+                div.className = "cart-item";
+                div.innerHTML = `
+                    <span class="cart-item-title">${prod.title} <span style="color:#888;font-size:0.95em;">x${item.qty}</span></span>
+                    <span>
+                        $${prod.price * item.qty}
+                        <button class="cart-item-remove" onclick="removeFromCart(${i})">Remove</button>
+                    </span>
+                `;
+                itemsDiv.appendChild(div);
+            });
+            totalDiv.textContent = `Total: $${total}`;
+        }
+
+        function removeFromCart(i) {
+            cart.splice(i, 1);
+            updateCartCount();
+            renderCart();
+        }
+
+        // Initial Render
+        renderProducts();
+        updateCartCount();
+
+        // Close cart modal on outside click
+        document.getElementById('cartModal').addEventListener('click', function(e) {
+            if (e.target === this) toggleCart();
+        });
+
+        // Keyboard: ESC to close cart
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "Escape") {
+                document.getElementById('cartModal').classList.remove('active');
+            }
+        });
+        
+    </script>
+</body>
+</html>

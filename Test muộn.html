@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>🎉 Chúc Mừng Sinh Nhật!</title>
+    <meta
+      name="description"
+      content="Trang web chúc mừng sinh nhật hiện đại với pháo giấy, đếm ngược, lời chúc và nhạc nền. Tùy biến dễ dàng bằng HTML/CSS/JS."
+    />
+    <meta name="theme-color" content="#8a6cff" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0b12;
+        --card: rgba(255, 255, 255, 0.08);
+        --card-2: rgba(255, 255, 255, 0.06);
+        --text: #f4f6fb;
+        --muted: #b9c1d9;
+        --primary: #8a6cff;
+        --accent: #20e3b2;
+        --danger: #ff6b6b;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        --radius: 22px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: radial-gradient(
+            1200px 600px at 10% 10%,
+            rgba(138, 108, 255, 0.18),
+            transparent 60%
+          ),
+          radial-gradient(
+            1000px 500px at 90% 20%,
+            rgba(32, 227, 178, 0.18),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #0b0b12 0%, #0d0d17 100%);
+        overflow-x: hidden;
+      }
+
+      /* Canvas background */
+      #confetti-canvas {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .container {
+        position: relative;
+        z-index: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+      }
+
+      header.hero {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 20px;
+        align-items: center;
+        background: linear-gradient(180deg, var(--card), var(--card-2));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        box-shadow: var(--shadow);
+        border-radius: var(--radius);
+        padding: 18px 18px;
+      }
+      .avatar {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: conic-gradient(from 220deg, var(--primary), var(--accent));
+        padding: 3px;
+      }
+      .avatar img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .title {
+        line-height: 1.05;
+        margin: 2px 0 6px;
+        font-weight: 800;
+        font-size: clamp(28px, 4.6vw, 52px);
+      }
+      .gradient-text {
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .subtitle {
+        color: var(--muted);
+        font-size: clamp(14px, 1.6vw, 18px);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .btn {
+        appearance: none;
+        border: 0;
+        padding: 12px 18px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.15s ease, box-shadow 0.15s ease,
+          background 0.3s ease;
+        background: #0f0f18;
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+      .btn.primary {
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        color: #0b0b12;
+      }
+      .btn.ghost {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 22px;
+        margin-top: 24px;
+      }
+
+      .card {
+        grid-column: span 12;
+        background: linear-gradient(180deg, var(--card), var(--card-2));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .countdown {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .pill {
+        min-width: 92px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 10px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        text-align: center;
+      }
+      .pill .num {
+        font-size: 30px;
+        font-weight: 800;
+      }
+      .pill .lbl {
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+      }
+
+      .section-title {
+        font-weight: 700;
+        font-size: 22px;
+        margin: 0 0 14px;
+      }
+
+      .gallery {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(6, 1fr);
+      }
+      .photo {
+        position: relative;
+        height: 160px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background-size: cover;
+        background-position: center;
+        box-shadow: var(--shadow);
+      }
+      .photo::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.35));
+      }
+
+      .wish-form {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr 2fr auto;
+      }
+      .wish-form input,
+      .wish-form textarea {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-family: inherit;
+        resize: vertical;
+      }
+      .wish-form textarea {
+        min-height: 44px;
+      }
+      .wish-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .wish-item {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 12px 14px;
+      }
+      .wish-item .meta {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      footer {
+        margin-top: 30px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      /* Responsive */
+      @media (max-width: 780px) {
+        header.hero {
+          grid-template-columns: 80px 1fr;
+        }
+        .avatar {
+          width: 80px;
+          height: 80px;
+        }
+        .gallery {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .wish-form {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Giảm chuyển động theo cài đặt hệ thống */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+      <header class="hero" role="banner">
+        <div class="avatar" aria-hidden="true">
+          <img
+            id="avatar"
+            src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop"
+            alt="Ảnh đại diện người được chúc"
+          />
+        </div>
+        <div>
+          <h1 class="title">
+            <span class="gradient-text" id="greeting">Chúc mừng sinh nhật</span>
+            <span id="name">Bạn</span>! 🎂
+          </h1>
+          <p class="subtitle">
+            Ngày đặc biệt của <strong id="date-text">hôm nay</strong> — chúc bạn
+            thật nhiều niềm vui, sức khỏe và bình an!
+          </p>
+          <div class="actions" role="group" aria-label="Hành động nhanh">
+            <button class="btn primary" id="launch-confetti">
+              Pháo giấy ✨
+            </button>
+            <button class="btn ghost" id="toggle-music" aria-pressed="false">
+              Phát nhạc ▶️
+            </button>
+            <button class="btn" id="share-link">Chia sẻ trang 🔗</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="grid" aria-label="Nội dung chính">
+        <div class="card" style="grid-column: span 12">
+          <h2 class="section-title">⏳ Đếm ngược tới sinh nhật</h2>
+          <div
+            class="countdown"
+            aria-live="polite"
+            aria-atomic="true"
+            id="countdown"
+          >
+            <div class="pill">
+              <div class="num" id="dd">0</div>
+              <div class="lbl">Ngày</div>
+            </div>
+            <div class="pill">
+              <div class="num" id="hh">0</div>
+              <div class="lbl">Giờ</div>
+            </div>
+            <div class="pill">
+              <div class="num" id="mm">0</div>
+              <div class="lbl">Phút</div>
+            </div>
+            <div class="pill">
+              <div class="num" id="ss">0</div>
+              <div class="lbl">Giây</div>
+            </div>
+            <span
+              id="countdown-status"
+              class="subtitle"
+              style="margin-left: 8px"
+            ></span>
+          </div>
+        </div>
+
+        <div class="card" style="grid-column: span 12">
+          <h2 class="section-title">📸 Khoảnh khắc đẹp</h2>
+          <div class="gallery" id="gallery">
+            <div
+              class="photo"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1602312621178-f7f2b98a1c9b?q=80&w=800&auto=format&fit=crop');
+              "
+              aria-label="Bánh sinh nhật"
+            ></div>
+            <div
+              class="photo"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1543629469-ffb8a5d0460a?q=80&w=800&auto=format&fit=crop');
+              "
+              aria-label="Bong bóng nhiều màu"
+            ></div>
+            <div
+              class="photo"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1603676260724-47e692f5b63e?q=80&w=800&auto=format&fit=crop');
+              "
+              aria-label="Nến lung linh"
+            ></div>
+            <div
+              class="photo"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop');
+              "
+              aria-label="Bạn bè vui vẻ"
+            ></div>
+            <div
+              class="photo"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1550639525-c97d455acf70?q=80&w=800&auto=format&fit=crop');
+              "
+              aria-label="Tặng quà"
+            ></div>
+            <div
+              class="photo"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=800&auto=format&fit=crop');
+              "
+              aria-label="Pháo kim tuyến"
+            ></div>
+          </div>
+        </div>
+
+        <div class="card" style="grid-column: span 12">
+          <h2 class="section-title">📝 Đăng ký tham gia</h2>
+          <form id="register-form" class="wish-form" autocomplete="on">
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Tên của bạn"
+              required
+              aria-label="Tên của bạn"
+            />
+            <input
+              type="email" 
+              id="email"
+              name="email"
+              placeholder="Email của bạn"
+              required
+              aria-label="Email"
+              autocomplete="email"
+              inputmode="email"
+            />
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder="Số điện thoại" 
+              pattern="[0-9]{10}"
+              required
+              aria-label="Số điện thoại"
+            />
+            <textarea
+              id="description"
+              name="description" 
+              placeholder="Mô tả..."
+              rows="3"
+              aria-label="Mô tả"
+            ></textarea>
+            <button class="btn primary" type="submit">Gửi đăng ký</button>
+          </form>
+        </div>
+
+        <div class="card" style="grid-column: span 12">
+          <h2 class="section-title">💌 Gửi lời chúc</h2>
+          <form id="wish-form" class="wish-form" autocomplete="on">
+            <input
+              type="text"
+              id="who"
+              name="who"
+              placeholder="Tên của bạn"
+              required
+              aria-label="Tên của bạn"
+            />
+            <textarea
+              id="message"
+              name="message"
+              placeholder="Viết lời chúc thật đẹp..."
+              required
+              aria-label="Lời chúc"
+            ></textarea>
+            <button class="btn primary" type="submit">Gửi 💖</button>
+          </form>
+          <div
+            class="wish-list"
+            id="wish-list"
+            aria-live="polite"
+            aria-relevant="additions"
+          ></div>
+        </div>
+      </section>
+
+      <footer>
+        Made with ♥ — Tùy chỉnh tên, ngày sinh & ảnh đại diện qua tham số URL.
+        Ví dụ: <code>?name=Lan&date=2025-10-05</code>
+      </footer>
+    </div>
+
+    <!-- Nhạc nền: thay đường dẫn bằng file của bạn (assets/happy-birthday.mp3) -->
+    <audio id="bgm" preload="auto" src="" crossorigin="anonymous"></audio>
+
+    <script>
+      // ====== Cấu hình nhanh qua URL ======
+      const params = new URLSearchParams(location.search);
+      const NAME = params.get("name") || "Bạn";
+      const DATE = params.get("date") || "2023-08-16"; // YYYY-MM-DD
+      const AVATAR = params.get("avatar");
+      const SONG = params.get("song");
+
+      document.getElementById("name").textContent = NAME;
+      if (AVATAR) {
+        document.getElementById("avatar").src = AVATAR;
+      }
+      if (SONG) {
+        document.getElementById("bgm").src = SONG;
+      }
+
+      // ====== Đếm ngược ======
+      const dd = document.getElementById("dd");
+      const hh = document.getElementById("hh");
+      const mm = document.getElementById("mm");
+      const ss = document.getElementById("ss");
+      const statusEl = document.getElementById("countdown-status");
+      const dateText = document.getElementById("date-text");
+
+      function parseTargetDate() {
+        const today = new Date();
+        let year = today.getFullYear();
+        if (!DATE) {
+          // Mặc định là hôm nay
+          const t = new Date();
+          t.setHours(23, 59, 59, 999);
+          dateText.textContent = t.toLocaleDateString("vi-VN");
+          return t;
+        }
+        const [y, m, d] = DATE.split("-").map(Number);
+        // Nếu có năm trong URL thì dùng trực tiếp, nếu không có thì tự động chọn năm gần nhất (sắp tới)
+        if (String(y).toString().length === 4) {
+          year = y;
+          return new Date(y, m - 1, d, 0, 0, 0, 0);
+        } else {
+          const month = y,
+            day = m; // người dùng nhập MM-DD
+          let t = new Date(year, month - 1, day, 0, 0, 0, 0);
+          if (t < today) t = new Date(year + 1, month - 1, day, 0, 0, 0, 0);
+          dateText.textContent = t.toLocaleDateString("vi-VN");
+          return t;
+        }
+      }
+
+      const target = parseTargetDate();
+      dateText.textContent = target.toLocaleDateString("vi-VN");
+
+      function updateCountdown() {
+        const now = new Date();
+        let diff = target - now;
+        if (diff <= 0) {
+          dd.textContent = "0";
+          hh.textContent = "0";
+          mm.textContent = "0";
+          ss.textContent = "0";
+          statusEl.textContent = "Đến giờ thổi nến!";
+          return;
+        }
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        diff -= d * 24 * 60 * 60 * 1000;
+        const h = Math.floor(diff / (1000 * 60 * 60));
+        diff -= h * 60 * 60 * 1000;
+        const m = Math.floor(diff / (1000 * 60));
+        diff -= m * 60 * 1000;
+        const s = Math.floor(diff / 1000);
+        dd.textContent = d;
+        hh.textContent = h;
+        mm.textContent = m;
+        ss.textContent = s;
+        statusEl.textContent = d > 0 ? `Còn ${d} ngày nữa` : "Sắp tới rồi!";
+      }
+      updateCountdown();
+      const timerId = setInterval(updateCountdown, 1000);
+
+      // ====== Pháo giấy ======
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      let W = (canvas.width = window.innerWidth);
+      let H = (canvas.height = window.innerHeight);
+      let confetti = [];
+      let animId = null;
+
+      const COLORS = ["#8a6cff", "#20e3b2", "#ffd166", "#ff6b6b", "#4dabf7"];
+
+      function spawnConfetti(count = 160) {
+        for (let i = 0; i < count; i++) {
+          confetti.push({
+            x: Math.random() * W,
+            y: -20 - Math.random() * H,
+            r: 6 + Math.random() * 10,
+            tilt: Math.random() * 10,
+            tiltSpeed: (Math.random() * 2 - 1) * 0.5,
+            fall: 1 + Math.random() * 3,
+            color: COLORS[(Math.random() * COLORS.length) | 0],
+          });
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (const p of confetti) {
+          p.y += p.fall;
+          p.tilt += p.tiltSpeed;
+          p.x += Math.sin(p.tilt) * 0.8;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y, p.r, p.r * 0.6, p.tilt, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        confetti = confetti.filter((p) => p.y < H + 30);
+        if (confetti.length > 0) {
+          animId = requestAnimationFrame(draw);
+        } else {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
+      }
+
+      function launchConfetti() {
+        spawnConfetti(220);
+        if (!animId) {
+          draw();
+        }
+      }
+
+      // Auto-resize
+      window.addEventListener("resize", () => {
+        W = canvas.width = innerWidth;
+        H = canvas.height = innerHeight;
+      });
+
+      // ====== Nhạc nền ======
+      const audio = document.getElementById("bgm");
+      const toggleBtn = document.getElementById("toggle-music");
+      toggleBtn.addEventListener("click", async () => {
+        try {
+          if (audio.paused) {
+            await audio.play();
+            toggleBtn.textContent = "Tạm dừng ⏸️";
+            toggleBtn.setAttribute("aria-pressed", "true");
+          } else {
+            audio.pause();
+            toggleBtn.textContent = "Phát nhạc ▶️";
+            toggleBtn.setAttribute("aria-pressed", "false");
+          }
+        } catch (e) {
+          alert(
+            "Hãy gán nguồn nhạc cho phần tử <audio> hoặc dùng tham số ?song=URL"
+          );
+        }
+      });
+
+      // ====== Chia sẻ ======
+      document
+        .getElementById("share-link")
+        .addEventListener("click", async () => {
+          const url = location.href;
+          try {
+            if (navigator.share) {
+              await navigator.share({
+                title: document.title,
+                text: `Chúc mừng sinh nhật ${NAME}!`,
+                url,
+              });
+            } else {
+              await navigator.clipboard.writeText(url);
+              alert("Đã sao chép liên kết vào clipboard!");
+            }
+          } catch (e) {
+            /* user cancelled */
+          }
+        });
+
+      // ====== Nút pháo giấy ======
+      document
+        .getElementById("launch-confetti")
+        .addEventListener("click", launchConfetti);
+
+      // ====== Lời chúc (LocalStorage) ======
+      const KEY = `birthday-wishes-${NAME}`;
+      const wishes = JSON.parse(localStorage.getItem(KEY) || "[]");
+      const listEl = document.getElementById("wish-list");
+
+      function renderWishes() {
+        listEl.innerHTML = "";
+        wishes
+          .slice()
+          .reverse()
+          .forEach((w) => {
+            const item = document.createElement("div");
+            item.className = "wish-item";
+            item.innerHTML = `<div class="meta">${w.who} • ${new Date(
+              w.at
+            ).toLocaleString("vi-VN")}</div><div>${w.msg}</div>`;
+            listEl.appendChild(item);
+          });
+      }
+
+      renderWishes();
+
+      document.getElementById("wish-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const who = document.getElementById("who").value.trim().slice(0, 60);
+        const msg = document
+          .getElementById("message")
+          .value.trim()
+          .slice(0, 300);
+        if (!who || !msg) return;
+        wishes.push({ who, msg, at: Date.now() });
+        localStorage.setItem(KEY, JSON.stringify(wishes));
+        e.target.reset();
+        renderWishes();
+        // hiệu ứng nhẹ khi gửi
+        launchConfetti();
+      });
+
+      // ====== Tự động pháo giấy một lần nếu không giảm chuyển động ======
+      const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (!media.matches) {
+        setTimeout(launchConfetti, 800);
+      }
+    </script>
+  </body>
+  <div class="pill">
+    <div class="num" id="dd">0</div>
+    <div class="lbl">Ngày</div>
+  </div>
+  <div class="pill">
+    <div class="num" id="hh">0</div>
+    <div class="lbl">Giờ</div>
+  </div>
+  <div class="pill">
+    <div class="num" id="mm">0</div>
+    <div class="lbl">Phút</div>
+  </div>
+  <div class="pill">
+    <div class="num" id="ss">0</div>
+    <div class="lbl">Giây</div>
+  </div>
+  <span id="countdown-status" class="subtitle" style="margin-left: 8px">
+    <span style="display: inline-block; animation: spin 1s linear infinite"
+      >⏳</span
+    >
+  </span>
+
+  <style>
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+        to {
+            transform: rotate(360deg);
+        }       <input
+      type="text"
+      placeholder="Tên đăng ký"
+      required
+      aria-label="Tên đăng ký"
+    />
+    <input type="email" placeholder="Email" required aria-label="Email" />
+    <input
+      type="tel"
+      placeholder="Số điện thoại"
+      pattern="[0-9]{10}"
+      required
+      aria-label="Số điện thoại"
+    />
+    <textarea placeholder="Mô tả..." rows="3" aria-label="Mô tả"></textarea>
+    <button class="btn primary" type="submit">Gửi đăng ký</button>
+  </form>
+  <div class="card" style="grid-column: span 12">
+    <h2 class="section-title">📝 Đăng ký</h2>
+    <form class="wish-form" autocomplete="on">
+      <input
+        type="text"
+        placeholder="Tên đăng ký"
+        required
+        aria-label="Tên đăng ký"
+      />
+      <input type="email" placeholder="Email" required aria-label="Email" />
+      <input
+        type="tel"
+        placeholder="Số điện thoại"
+        pattern="[0-9]{10}"
+        required
+        aria-label="Số điện thoại"
+      />
+      <textarea placeholder="Mô tả..." rows="3" aria-label="Mô tả"></textarea>
+      <button class="btn primary" type="submit">Gửi đăng ký</button>
+    </form>
+  </div>
+</div>

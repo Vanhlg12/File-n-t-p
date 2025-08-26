@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web Bán Hàng Online</title>
+  <style>
+    /* ======= Reset & Base ======= */
+    * {box-sizing:border-box;margin:0;padding:0;}
+    body {font-family:Arial,sans-serif;line-height:1.5;background:#f9f9f9;color:#333;}
+    a{text-decoration:none;color:inherit;}
+    img{max-width:100%;display:block;}
+    ul{list-style:none;}
+    /* ======= Header ======= */
+    header{background:#2196F3;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;}
+    header h1{font-size:1.5rem;}
+    nav ul{display:flex;gap:15px;}
+    nav li{cursor:pointer;}
+    nav li:hover{opacity:.8;}
+    .hamburger{display:none;cursor:pointer;font-size:1.5rem;}
+    /* ======= Main ======= */
+    main{padding:20px;}
+    .grid{display:grid;gap:20px;}
+    .home-slider{overflow:hidden;position:relative;width:100%;height:300px;margin-bottom:40px;}
+    .home-slider .slides{display:flex;width:500%;animation:slide 10s infinite;}
+    .home-slider .slide{flex:1;}
+    @keyframes slide{0%,20%{transform:translateX(0);}25%,45%{transform:translateX(-100%);}50%,70%{transform:translateX(-200%);}75%,95%{transform:translateX(-300%);}100%{transform:translateX(0);}}
+    .categories{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:40px;}
+    .category{background:#fff;border:1px solid #ddd;padding:20px;text-align:center;cursor:pointer;}
+    /* ======= Product List ======= */
+    .products{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
+    .product{background:#fff;border:1px solid #ddd;padding:15px;display:flex;flex-direction:column;align-items:center;}
+    .product h3{margin:10px 0;font-size:1.1rem;}
+    .product .price{color:#E91E63;font-weight:bold;margin-bottom:10px;}
+    .product button{margin-top:auto;padding:8px 12px;background:#4CAF50;color:#fff;border:none;cursor:pointer;border-radius:4px;}
+    /* ======= Cart & Checkout ======= */
+    #cartModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;}
+    #cartContent{background:#fff;width:90%;max-width:600px;padding:20px;border-radius:4px;max-height:80%;overflow:auto;}
+    #cartContent h2{margin-bottom:10px;}
+    #cartItems .cart-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eee;}
+    #cartItems .cart-item:last-child{border:none;}
+    #cartItems img{width:60px;height:60px;object-fit:cover;border:1px solid #ddd;border-radius:4px;}
+    #cartItems .item-info{flex:1;}
+    #cartItems .qty{width:40px;}
+    #cartTotal{font-size:1.2rem;margin:10px 0;text-align:right;}
+    #checkoutBtn{padding:10px 15px;background:#2196F3;color:#fff;border:none;cursor:pointer;border-radius:4px;}
+    /* ======= Footer ======= */
+    footer{background:#333;color:#fff;text-align:center;padding:15px;margin-top:40px;}
+    /* ======= Responsive ======= */
+    @media (max-width:768px){
+      nav ul{display:none;}
+      .hamburger{display:block;}
+      .grid{grid-template-columns:1fr!important;}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>My Shop</h1>
+    <nav>
+      <ul>
+        <li data-cat="all">Trang chủ</li>
+        <li data-cat="clothing">Quần áo</li>
+        <li data-cat="cosmetics">Mỹ phẩm</li>
+        <li data-cat="sports">Dụng cụ thể thao</li>
+      </ul>
+    </nav>
+    <span class="hamburger" onclick="toggleMenu()">☰</span>
+    <button onclick="openCart()">🛒 Giỏ (<span id="cartCount">0</span>)</button>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <!-- Slider -->
+    <div class="home-slider">
+      <div class="slides">
+        <img src="https://via.placeholder.com/800x300?text=Banner+1" alt="Banner1">
+        <img src="https://via.placeholder.com/800x300?text=Banner+2" alt="Banner2">
+        <img src="https://via.placeholder.com/800x300?text=Banner+3" alt="Banner3">
+        <img src="https://via.placeholder.com/800x300?text=Banner+4" alt="Banner4">
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="grid categories" id="categoryList"></div>
+
+    <!-- Products -->
+    <h2 id="prodTitle">Tất cả sản phẩm</h2>
+    <div class="grid products" id="productList"></div>
+  </main>
+
+  <!-- Cart Modal -->
+  <div id="cartModal">
+    <div id="cartContent">
+      <h2>Giỏ hàng</h2>
+      <div id="cartItems"></div>
+      <div id="cartTotal">Tổng tiền: 0₫</div>
+      <button id="checkoutBtn" onclick="checkout()">Thanh toán</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>&copy; 2025 My Shop. All rights reserved.</footer>
+
+  <!-- Script -->
+  <script>
+    // Dữ liệu mẫu
+    const products = [
+      {id:1,cat:'clothing',name:'Áo Thun Trắng',price:200000,img:'https://via.placeholder.com/200?text=Ao+Thun'},
+      {id:2,cat:'cosmetics',name:'Kem Dưỡng Da',price:500000,img:'https://via.placeholder.com/200?text=Kem+Duong'},
+      {id:3,cat:'sports',name:'Giày Thể Thao',price:1000000,img:'https://via.placeholder.com/200?text=Giay+The+Thao'},
+      {id:4,cat:'clothing',name:'Quần Jeans',price:350000,img:'https://via.placeholder.com/200?text=Quan+Jeans'},
+      // ... thêm sản phẩm
+    ];
+
+    // LocalStorage Cart
+    let cart = JSON.parse(localStorage.getItem('cart'))||[];
+    function saveCart(){ localStorage.setItem('cart', JSON.stringify(cart)); updateCartUI(); }
+
+    // Menu Responsive
+    function toggleMenu(){ document.querySelector('nav ul').classList.toggle('active'); }
+
+    // Render Category
+    const cats = ['all','clothing','cosmetics','sports'];
+    const catElm = document.getElementById('categoryList');
+    cats.forEach(c=>{
+      const d=document.createElement('div');d.className='category';d.textContent= c=='all'?'Tất cả':(c=='clothing'?'Quần áo':c=='cosmetics'?'Mỹ phẩm':'Dụng cụ');
+      d.onclick=()=>loadProducts(c);
+      catElm.appendChild(d);
+    });
+
+    // Load Products
+    function loadProducts(cat){
+      const list = document.getElementById('productList');
+      list.innerHTML=''; document.getElementById('prodTitle').textContent = cat=='all'?'Tất cả sản phẩm':document.querySelector(`[data-cat="${cat}"]`).textContent;
+      products.filter(p=>cat=='all'||p.cat==cat).forEach(p=>{
+        const box=document.createElement('div');box.className='product';
+        box.innerHTML=`<img src="${p.img}" alt="${p.name}"><h3>${p.name}</h3><div class="price">${p.price.toLocaleString()}₫</div><button onclick="addToCart(${p.id})">Thêm vào giỏ</button>`;
+        list.appendChild(box);
+      });
+    }
+
+    // Giỏ Hàng UI
+    function updateCartUI(){
+      const ci = document.getElementById('cartItems');
+      ci.innerHTML=''; let total=0;
+      cart.forEach((it,i)=>{
+        const p=products.find(x=>x.id==it.id);
+        const row = document.createElement('div');row.className='cart-item';
+        row.innerHTML=`<img src="${p.img}" alt=""><div class="item-info"><h4>${p.name}</h4><input type="number" min="1" class="qty" value="${it.qty}" onchange="changeQty(${i},this.value)"></div><div class="price">${(p.price*it.qty).toLocaleString()}₫</div>`;
+        ci.appendChild(row);
+        total+=p.price*it.qty;
+      });
+      document.getElementById('cartTotal').textContent=`Tổng tiền: ${total.toLocaleString()}₫`;
+      document.getElementById('cartCount').textContent= cart.reduce((a,b)=>a+b.qty,0);
+      saveCart();
+    }
+
+    function addToCart(id){
+      const idx = cart.findIndex(x=>x.id==id);
+      if(idx>=0) cart[idx].qty++;
+      else cart.push({id,qty:1});
+      saveCart();
+      alert('Đã thêm vào giỏ!');
+    }
+
+    function changeQty(idx,q){ cart[idx].qty = +q; saveCart(); }
+
+    // Mở/đóng Cart
+    function openCart(){ document.getElementById('cartModal').style.display='flex'; updateCartUI(); }
+    window.onclick=e=>{ if(e.target.id=='cartModal') document.getElementById('cartModal').style.display='none'; }
+
+    // Checkout
+    function checkout(){
+      if(!cart.length) return alert('Giỏ hàng trống!');
+      // Gửi thông tin thanh toán, tích hợp VNPAY/MoMo/... tại đây
+      alert('Chức năng thanh toán đang xây dựng...');
+    }
+
+    // Khởi tạo
+    loadProducts('all');
+    updateCartUI();
+  </script>
+
+</body>
+</html>

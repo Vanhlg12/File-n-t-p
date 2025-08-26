@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Du lịch muôn nơi</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+        background: #f8f9fa;
+      }
+      header {
+        background: url("https://media.hanamtv.vn/upload/image/201708/medium/49852_Du-Lich_6.jpg")
+          no-repeat center center/cover;
+        color: white;
+        text-align: center;
+        padding: 80px 20px;
+      }
+      header h1 {
+        font-size: 3em;
+        margin: 0;
+        text-shadow: 2px 2px 4px #000;
+      }
+      nav {
+        background: #0077b6;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 12px;
+      }
+      nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      section {
+        padding: 20px;
+        max-width: 1000px;
+        margin: auto;
+      }
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+      }
+      .gallery img {
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+      footer {
+        background: #023e8a;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <h1>🌏 Du lịch muôn nơi</h1>
+      <p>Khám phá thế giới cùng chúng tôi</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+      <a href="#">Trang chủ</a>
+      <a href="#">Giới thiệu</a>
+      <a href="#">Tour nổi bật</a>
+      <a href="#">Ưu đãi</a>
+      <a href="#">Liên hệ</a>
+    </nav>
+
+    <!-- Gallery -->
+    <section>
+      <h2>Hình ảnh điểm đến</h2>
+      <div class="gallery">
+        <img
+          src="https://media.hanamtv.vn/upload/image/201708/medium/49847_Du-Lich_1-01.jpg"
+          alt="Du lịch muôn nơi"
+        />
+        <img
+          src="https://media.hanamtv.vn/upload/image/201708/medium/49855_Du-Lich_9.jpg"
+          alt="Du lịch muôn nơi"
+        />
+        <img
+          src="https://media.hanamtv.vn/upload/image/201708/medium/49849_Du-Lich_3.jpg"
+          alt="Du lịch muôn nơi"
+        />
+        <img
+          src="https://media.hanamtv.vn/upload/image/201708/medium/49848_Du-Lich_2.jpg"
+          alt="Du lịch muôn nơi"
+        />
+        <img
+          src="https://media.hanamtv.vn/upload/image/201708/medium/49852_Du-Lich_6.jpg"
+          alt="Du lịch muôn nơi"
+        />
+        <img
+          src="https://media.hanamtv.vn/upload/image/201708/medium/49856_Du-Lich_10.jpg"
+          alt="Du lịch muôn nơi"
+        />
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section>
+      <h2>Dịch vụ du lịch</h2>
+      <div class="card">
+        <ul>
+          <li>Du lịch trong nước - <em>Giá vé ưu đãi</em></li>
+          <li>Du lịch nước ngoài - <em>Địa điểm khuyên đi</em></li>
+          <li>Du lịch theo tour</li>
+          <li>Du lịch tự túc</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Promotion -->
+    <section>
+      <h2>🎁 Ưu đãi hấp dẫn</h2>
+      <div class="card">
+        <p>
+          Giảm giá <strong>20%</strong> cho khách hàng đặt tour trước
+          <strong>30 ngày</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section>
+      <h2>Liên hệ</h2>
+      <div class="card">
+        <p>📞 Số điện thoại: 0123456789</p>
+        <p>
+          📧
+          <a href="mailto:contact@dulichmuonnoi.com"
+            >contact@dulichmuonnoi.com</a
+          >
+        </p>
+        <p>
+          📍
+          <a href="https://www.google.com/maps" target="_blank"
+            >123 Đường ABC, Quận 1, TP.HCM</a
+          >
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p><strong>Xin chào,</strong> chúc các bạn có những chuyến đi vui vẻ!</p>
+      <ul style="list-style: none; padding: 0">
+        <li>Facebook | Instagram | Zalo | Twitter</li>
+      </ul>
+    </footer>
+  </body>
+</html>
